@@ -5,9 +5,12 @@ import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 
 public class EnPassantPawn extends Piece{
 	
+	private final PieceType type = PieceType.EN_PASSANT_PAWN;
+
 	public EnPassantPawn(Color color) {
 		super(color);
 	}
@@ -20,6 +23,11 @@ public class EnPassantPawn extends Piece{
 	@Override
 	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
 		return new ArrayList<Coordinate>();
+	}
+	
+	@Override
+	public PieceType getType() {
+		return type;
 	}
 	
 }

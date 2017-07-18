@@ -5,9 +5,12 @@ import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
 
 public class Queen  extends Piece {
+
+	private final PieceType type = PieceType.QUEEN;
 
 	public Queen(Color color) {
 		super(color);
@@ -31,6 +34,11 @@ public class Queen  extends Piece {
 	@Override
 	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
 		return possibleAttackMoves(from);
+	}
+	
+	@Override
+	public PieceType getType() {
+		return type;
 	}
 	
 	private List<Coordinate> possibleAttackMovesDiagonal(Coordinate from) {

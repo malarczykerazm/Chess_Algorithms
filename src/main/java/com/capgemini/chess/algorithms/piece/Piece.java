@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 
 public abstract class Piece {
 	
@@ -12,6 +13,8 @@ public abstract class Piece {
 	public Piece(Color color) {
 		this.color = color;
 	}
+	
+	public abstract PieceType getType();
 	
 	public abstract List<Coordinate> possibleAttackMoves(Coordinate from);
 	

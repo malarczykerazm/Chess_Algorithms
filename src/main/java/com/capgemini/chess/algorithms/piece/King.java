@@ -5,8 +5,11 @@ import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 
 public class King  extends Piece {
+
+	private final PieceType type = PieceType.KING;
 
 	public King(Color color) {
 		super(color);
@@ -30,6 +33,11 @@ public class King  extends Piece {
 	@Override
 	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
 		return possibleAttackMoves(from);
+	}
+	
+	@Override
+	public PieceType getType() {
+		return type;
 	}
 	
 	private List<Coordinate> possibleAttackMovesDiagonal(Coordinate from) {

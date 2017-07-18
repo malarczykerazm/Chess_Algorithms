@@ -5,9 +5,12 @@ import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
 
 public class Bishop extends Piece {
+	
+	private final PieceType type = PieceType.BISHOP;
 
 	public Bishop(Color color) {
 		super(color);
@@ -30,6 +33,11 @@ public class Bishop extends Piece {
 	@Override
 	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
 		return possibleAttackMoves(from);
+	}
+	
+	@Override
+	public PieceType getType() {
+		return type;
 	}
 
 }

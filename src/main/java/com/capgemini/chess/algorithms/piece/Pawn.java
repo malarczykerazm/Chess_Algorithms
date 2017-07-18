@@ -5,8 +5,11 @@ import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 
 public class Pawn extends Piece {
+	
+	private final PieceType type = PieceType.PAWN;
 
 	public Pawn(Color color) {
 		super(color);
@@ -21,6 +24,11 @@ public class Pawn extends Piece {
 		}
 		//TODO WrongColorException?
 		return null;
+	}
+	
+	@Override
+	public PieceType getType() {
+		return type;
 	}
 	
 	@Override
@@ -65,5 +73,5 @@ public class Pawn extends Piece {
 		allPossibleCaptureMovesBlack = Piece.addIfValid(allPossibleCaptureMovesBlack, toLeft);
 		return allPossibleCaptureMovesBlack;
 	}
-	
+
 }

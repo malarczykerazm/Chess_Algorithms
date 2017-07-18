@@ -5,10 +5,13 @@ import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
 
 public class Rook  extends Piece {
 
+	private final PieceType type = PieceType.ROOK;
+	
 	public Rook(Color color) {
 		super(color);
 	}
@@ -28,6 +31,11 @@ public class Rook  extends Piece {
 	@Override
 	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
 		return possibleAttackMoves(from);
+	}
+	
+	@Override
+	public PieceType getType() {
+		return type;
 	}
 	
 	private List<Coordinate> possibleAttackMovesDirY(Coordinate from) {
@@ -51,5 +59,5 @@ public class Rook  extends Piece {
 		}
 		return allPossibleMovesDirX;
 	}
-	
+
 }

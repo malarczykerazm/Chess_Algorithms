@@ -5,14 +5,26 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;
-import com.capgemini.chess.algorithms.move.*;
-import com.capgemini.chess.algorithms.move.Move;
 import com.capgemini.chess.algorithms.data.enums.BoardState;
 import com.capgemini.chess.algorithms.data.enums.Color;
-import com.capgemini.chess.algorithms.piece.*;
+import com.capgemini.chess.algorithms.data.enums.MoveType;
+import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidColorException;
 import com.capgemini.chess.algorithms.implementation.exceptions.InvalidMoveException;
 import com.capgemini.chess.algorithms.implementation.exceptions.KingInCheckException;
+import com.capgemini.chess.algorithms.implementation.exceptions.NoKingException;
+import com.capgemini.chess.algorithms.move.AttackMove;
+import com.capgemini.chess.algorithms.move.CaptureMove;
+import com.capgemini.chess.algorithms.move.Move;
+import com.capgemini.chess.algorithms.move.MoveValidation;
+import com.capgemini.chess.algorithms.piece.Bishop;
+import com.capgemini.chess.algorithms.piece.King;
+import com.capgemini.chess.algorithms.piece.Knight;
+import com.capgemini.chess.algorithms.piece.Pawn;
+import com.capgemini.chess.algorithms.piece.Piece;
+import com.capgemini.chess.algorithms.piece.Queen;
+import com.capgemini.chess.algorithms.piece.Rook;
 
 /**
  * Class for managing of basic operations on the Chess Board.
@@ -60,10 +72,10 @@ public class BoardManager {
 	 * @throws InvalidMoveException
 	 *             in case move is not valid
 	 */
-	public Move performMove(Coordinate from, Coordinate to) throws InvalidMoveException {
+	public Move performMove(Coordinate from, Coordinate to) throws InvalidMoveException, InvalidColorException, NoKingException {
 
 		Move move = validateMove(from, to);
-
+		// TODO złapać wyjątek koloru?
 		addMove(move);
 
 		return move;
@@ -74,12 +86,13 @@ public class BoardManager {
 	 *
 	 * @return state of the chess board
 	 */
-	public BoardState updateBoardState() {
+	public BoardState updateBoardState() throws InvalidColorException, NoKingException {
 
 		Color nextMoveColor = calculateNextMoveColor();
 
 		boolean isKingInCheck = isKingInCheck(nextMoveColor);
 		boolean isAnyMoveValid = isAnyMoveValid(nextMoveColor);
+		// TODO złapać wyjątek koloru?
 
 		BoardState boardState;
 		if (isKingInCheck) {
@@ -144,8 +157,8 @@ public class BoardManager {
 
 		for (int i = this.board.getMoveHistory().size() - 1; i >= this.board.getMoveHistory().size() - 100; i--) {
 			Move currentMove = this.board.getMoveHistory().get(i);
-			Object currentPieceType = currentMove.getMovedPiece().getClass();
-			if (currentMove.getClass() != AttackMove.class || currentPieceType == Pawn.class) {
+			PieceType currentPieceType = currentMove.getMovedPiece().getType();
+			if (currentMove.getType() != MoveType.ATTACK || currentPieceType == PieceType.PAWN) {
 				return false;
 			}
 		}
@@ -188,9 +201,9 @@ public class BoardManager {
 
 		addRegularMove(move);
 
-		if (move.getClass() == CastlingMove.class) {
+		if (move.getType() == MoveType.CASTLING) {
 			addCastling(move);
-		} else if (move.getClass() == EnPassantMove.class) {
+		} else if (move.getType() == MoveType.EN_PASSANT) {
 			addEnPassant(move);
 		}
 
@@ -206,7 +219,7 @@ public class BoardManager {
 	}
 
 	private void performPromotion(Move move, Piece movedPiece) {
-		if (movedPiece.getClass() == Pawn.class &&
+		if (movedPiece.getType() == PieceType.PAWN &&
 			(move.getTo().getY() == (Board.SIZE - 1)) || (move.getTo().getY() == 0)) {
 			move.setMovedPiece(new Queen(movedPiece.getColor()));
 		}
@@ -227,26 +240,49 @@ public class BoardManager {
 	private void addEnPassant(Move move) {
 		Move lastMove = this.board.getMoveHistory().get(this.board.getMoveHistory().size() - 1);
 		this.board.setPieceAt(null, lastMove.getTo());
+		//TODO null?
 	}
 
-	private Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException {
+	private Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
+		MoveValidation moveVal = new MoveValidation(this.board);
 		
-		// TODO please add implementation here
-		return null;
+		if(moveVal.isAttackValidNotConsideringCheck(from, to)) {
+			List<Move> tempMoveHistory = this.board.getMoveHistory();
+			Move consideredMove = new AttackMove(from, to, this.board.getPieceAt(from));			
+			tempMoveHistory.add(consideredMove);
+			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
+			Board tempBoard = tempBoardManager.getBoard();
+			if(tempBoardManager.isKingInCheck(tempBoard.getPieceAt(to).getColor())) {
+				throw new KingInCheckException();
+			}
+			return consideredMove;
+		}
+		
+		if(moveVal.isCaptureValidNotConsideringCheck(from, to)) {
+			List<Move> tempMoveHistory = this.board.getMoveHistory();
+			Move consideredMove = new CaptureMove(from, to, this.board.getPieceAt(from));			
+			tempMoveHistory.add(consideredMove);
+			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
+			Board tempBoard = tempBoardManager.getBoard();
+			if(tempBoardManager.isKingInCheck(tempBoard.getPieceAt(to).getColor())) {
+				throw new KingInCheckException();
+			}
+			return consideredMove;
+		}
+		throw new InvalidMoveException();
+		// TODO gdzie złapać wyjątek koloru
 	}
 
 	
-	private boolean isKingInCheck(Color kingColor) {
-		MoveValidation moveVal = new MoveValidation(this.board);
+	private boolean isKingInCheck(Color kingColor) throws InvalidColorException, NoKingException {
+	MoveValidation moveVal = new MoveValidation(this.board);
 		for(Coordinate square : findAllPiecesOfColor(oppositeColor(kingColor))) {
-			try {
-				moveVal.validateMove(square, findTheKing(kingColor));
+			if(moveVal.isCaptureValidNotConsideringCheck(square, findTheKing(kingColor))) {
 				return true;
-			} catch(InvalidMoveException e) {
 			}
 		}
-		// TODO please add implementation here
 		return false;
+		// TODO złapać wyjątek koloru?
 	}
 	
 	private List<Coordinate> findAllPiecesOfColor(Color color) {
@@ -263,21 +299,20 @@ public class BoardManager {
 		return allPiecesOfColor;
 	}
 	
-	private Coordinate findTheKing(Color color) {
+	private Coordinate findTheKing(Color color) throws NoKingException {
 		//TODO DODADNO
 		for(int i = 0; i < Board.SIZE; i++) {
 			for(int j = 0; j < Board.SIZE; j++) {
 				Coordinate square = new Coordinate(i, j);
-				if(this.board.getPieceAt(square).getClass() == King.class) {
+				if(this.board.getPieceAt(square).getType() == PieceType.KING) {
 					return square;
 				}				
 			}
 		}
-		//TODO NoKingException?!
-		return new Coordinate(0, 0);
+		throw new NoKingException();
 	}
 	
-	private Color oppositeColor(Color color) {
+	private Color oppositeColor(Color color) throws InvalidColorException {
 		//TODO DODANO
 		if(color == Color.WHITE) {
 			return Color.BLACK;
@@ -285,7 +320,7 @@ public class BoardManager {
 		if(color == Color.BLACK) {
 			return Color.WHITE;
 		}
-	throw new InvalidColorException("The King has no valid colour!");
+	throw new InvalidColorException();
 	}
 
 	private boolean isAnyMoveValid(Color nextMoveColor) {
@@ -308,7 +343,7 @@ public class BoardManager {
 		int lastNonAttackMoveIndex = 0;
 
 		for (Move move : this.board.getMoveHistory()) {
-			if (move.getClass() != AttackMove.class) {
+			if (move.getType() != MoveType.ATTACK) {
 				lastNonAttackMoveIndex = counter;
 			}
 			counter++;
