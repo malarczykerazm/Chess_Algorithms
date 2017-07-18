@@ -248,7 +248,8 @@ public class BoardManager {
 		
 		if(moveVal.isAttackValidNotConsideringCheck(from, to)) {
 			List<Move> tempMoveHistory = this.board.getMoveHistory();
-			Move consideredMove = new AttackMove(from, to, this.board.getPieceAt(from));			
+			Move consideredMove = new AttackMove(from, to);
+			consideredMove.setMovedPiece(this.board.getPieceAt(from));
 			tempMoveHistory.add(consideredMove);
 			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
 			Board tempBoard = tempBoardManager.getBoard();
@@ -260,7 +261,8 @@ public class BoardManager {
 		
 		if(moveVal.isCaptureValidNotConsideringCheck(from, to)) {
 			List<Move> tempMoveHistory = this.board.getMoveHistory();
-			Move consideredMove = new CaptureMove(from, to, this.board.getPieceAt(from));			
+			Move consideredMove = new CaptureMove(from, to);
+			consideredMove.setMovedPiece(this.board.getPieceAt(from));
 			tempMoveHistory.add(consideredMove);
 			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
 			Board tempBoard = tempBoardManager.getBoard();

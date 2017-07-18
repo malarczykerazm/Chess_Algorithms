@@ -12,10 +12,9 @@ public abstract class Move {
 	
 	public abstract MoveType getType();
 
-	public Move(Coordinate from, Coordinate to, Piece movedPiece) {
+	public Move(Coordinate from, Coordinate to) {
 		this.from = from;
 		this.to = to;
-		this.movedPiece = movedPiece;
 	}
 
 	public Coordinate getFrom() {
