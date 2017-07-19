@@ -16,14 +16,10 @@ public class MoveValidation {
 	}
 	
 	public boolean isAttackValidWithoutConsideringCheck(Coordinate from, Coordinate to) {
-		if(!(from.isValid())) { return false; }
-		
-		if(!(to.isValid())) { return false; }
-		
 		Piece movedPiece = this.board.getPieceAt(from);
 		List<Coordinate> possibleAttacks = movedPiece.possibleAttackMoves(from);
 		
-		if(movedPiece.getType() == PieceType.PAWN && !(wasThePawnMoved(from))) {
+		if(movedPiece.getType() == PieceType.PAWN && isThisTheFirstMoveOfThePawn(from)) {
 			possibleAttacks = movedPiece.possibleAttackMovesForFirstMove(from);
 		}
 		
@@ -39,12 +35,9 @@ public class MoveValidation {
 	
 	
 	public boolean isCaptureValidWithoutConsideringCheck(Coordinate from, Coordinate to) {
-		if(!(from.isValid())) { return false; }
-		
-		if(!(to.isValid())) { return false; }
-		
 		Piece movedPiece = this.board.getPieceAt(from);
 		List<Coordinate> possibleCaptures = movedPiece.possibleCaptureMoves(from);
+		
 		for (Coordinate square : possibleCaptures) {
 			if(square.equals(to)) {
 				if (isCapturePossibleForDestination(from, to) && isTheWayFreeToGo(from, to)) {
@@ -141,10 +134,12 @@ public class MoveValidation {
 		if(startX == stopX || startY == stopY) {
 			return true;
 		}
-		int directionX = (stopX - startX) / Math.abs(stopX - startX);
-		int directionY = (stopY - startY) / Math.abs(stopY - startY);
+		int absDistanceX = Math.abs(stopX - startX);
+		int directionX = (stopX - startX) / absDistanceX;
+		int absDistanceY = Math.abs(stopY - startY);
+		int directionY = (stopY - startY) / absDistanceY;
 		
-		for (int i = startX + 1; i < stopX; i++) {
+		for (int i = 1; i < absDistanceX; i++) {
 			Coordinate squareOnTheWay = new Coordinate(from.getX() + i * directionX, from.getY() + i * directionY);
 			Piece pieceOnTheWay = this.board.getPieceAt(squareOnTheWay);
 			if (pieceOnTheWay != null && pieceOnTheWay.getType() != PieceType.EN_PASSANT_PAWN) {
@@ -154,10 +149,21 @@ public class MoveValidation {
 		return true;
 	}
 	
-	private boolean wasThePawnMoved(Coordinate from) {
+	private boolean isThisTheFirstMoveOfThePawn(Coordinate from) {
+		if(this.board.getPieceAt(from).getType() != PieceType.PAWN) {
+			return false;
+		}
+		if(from.getY() == Board.SIZE - 2 || from.getY() == 1) {
+			return !(wasThePieceMoved(from));				
+		}
+		return false;
+	}
+	
+	private boolean wasThePieceMoved(Coordinate from) {
 		for(Move performedMove : this.board.getMoveHistory()) {
-			performedMove.getFrom().equals(from);
-			return true;
+			if(performedMove.getFrom().equals(from)) {
+				return true;				
+			}
 		}
 		return false;
 	}

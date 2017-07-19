@@ -179,7 +179,9 @@ public class BoardManagerTest {
 		// given
 		Board board = new Board();
 		board.setPieceAt(new Bishop(Color.WHITE), new Coordinate(0, 6));
-		
+			// King added to make the test possible to run
+			board.setPieceAt(new King(Color.WHITE), new Coordinate(3, 1)); 
+			
 		// when
 		BoardManager boardManager = new BoardManager(board);
 		Move move = boardManager.performMove(new Coordinate(0, 6), new Coordinate(6, 0));
@@ -195,6 +197,8 @@ public class BoardManagerTest {
 		Board board = new Board();
 		board.getMoveHistory().add(createDummyMove(board));
 		board.setPieceAt(new Pawn(Color.BLACK), new Coordinate(4, 6));
+			// King added to make the test possible to run
+			board.setPieceAt(new King(Color.BLACK), new Coordinate(7, 7)); 
 		
 		// when
 		BoardManager boardManager = new BoardManager(board);
@@ -227,6 +231,8 @@ public class BoardManagerTest {
 		board.getMoveHistory().add(createDummyMove(board));
 		board.setPieceAt(new Knight(Color.BLACK), new Coordinate(3, 4));
 		board.setPieceAt(new Rook(Color.WHITE), new Coordinate(2, 6));
+			// King added to make the test possible to run
+			board.setPieceAt(new King(Color.BLACK), new Coordinate(0, 0)); 
 		
 		// when
 		BoardManager boardManager = new BoardManager(board);
@@ -243,6 +249,8 @@ public class BoardManagerTest {
 		Board board = new Board();
 		board.setPieceAt(new Queen(Color.WHITE), new Coordinate(5, 0));
 		board.setPieceAt(new Pawn(Color.BLACK), new Coordinate(7, 2));
+			// King added to make the test possible to run
+			board.setPieceAt(new King(Color.WHITE), new Coordinate(0, 0)); 
 		
 		// when
 		BoardManager boardManager = new BoardManager(board);
@@ -260,6 +268,8 @@ public class BoardManagerTest {
 		board.getMoveHistory().add(createDummyMove(board));
 		board.setPieceAt(new Rook(Color.BLACK), new Coordinate(1, 4));
 		board.setPieceAt(new Knight(Color.WHITE), new Coordinate(5, 4));
+			// King added to make the test possible to run
+			board.setPieceAt(new King(Color.BLACK), new Coordinate(7, 7)); 
 		
 		// when
 		BoardManager boardManager = new BoardManager(board);
@@ -422,6 +432,8 @@ public class BoardManagerTest {
 		// given
 		Board board = new Board();
 		board.setPieceAt(new Pawn(Color.WHITE), new Coordinate(1, 2));
+			// King added to make the test possible to run
+			board.setPieceAt(new King(Color.WHITE), new Coordinate(5, 2)); 
 		
 		// when
 		BoardManager boardManager = new BoardManager(board);

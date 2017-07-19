@@ -218,8 +218,8 @@ public class BoardManager {
 	}
 
 	private void performPromotion(Move move, Piece movedPiece) {
-		if (movedPiece.getType() == PieceType.PAWN &&
-			(move.getTo().getY() == (Board.SIZE - 1)) || (move.getTo().getY() == 0)) {
+		if (movedPiece.getType() == PieceType.PAWN
+				&& ((move.getTo().getY() == (Board.SIZE - 1)) || (move.getTo().getY() == 0))) {
 			move.setMovedPiece(new Queen(movedPiece.getColor()));
 		}
 	}
@@ -243,11 +243,23 @@ public class BoardManager {
 	}
 
 	private Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
+		if(!(from.isValid())) { throw new InvalidMoveException("The start square is out of the board!"); }
+		
+		if(!(to.isValid())) { throw new InvalidMoveException("The destination square is out of the board!"); }
+
+		Piece movedPiece = this.board.getPieceAt(from);
+		
+		if(movedPiece == null || movedPiece.getType() == PieceType.EN_PASSANT_PAWN) { throw new InvalidMoveException("The start square is empty!"); }
+	
+		if(movedPiece.getColor() != calculateNextMoveColor()) {
+			throw new InvalidMoveException("Next color to perform move is" + calculateNextMoveColor());
+		}
+		
 		MoveValidation moveVal = new MoveValidation(this.board);
 		
 		if(moveVal.isAttackValidWithoutConsideringCheck(from, to)) {
 			Move consideredMove = new AttackMove(from, to);
-			consideredMove.setMovedPiece(this.board.getPieceAt(from));
+			consideredMove.setMovedPiece(movedPiece);
 			tempPiecesSwap(from, to);
 			if(isKingInCheck(this.board.getPieceAt(to).getColor())) {
 				throw new KingInCheckException();
@@ -258,7 +270,7 @@ public class BoardManager {
 		
 		if(moveVal.isCaptureValidWithoutConsideringCheck(from, to)) {
 			Move consideredMove = new CaptureMove(from, to);
-			consideredMove.setMovedPiece(this.board.getPieceAt(from));
+			consideredMove.setMovedPiece(movedPiece);
 			tempPiecesSwap(from, to);
 			if(isKingInCheck(this.board.getPieceAt(to).getColor())) {
 				throw new KingInCheckException();
@@ -308,7 +320,8 @@ public class BoardManager {
 			for(int j = 0; j < Board.SIZE; j++) {
 				Coordinate square = new Coordinate(i, j);
 				Piece currentPiece = this.board.getPieceAt(square);
-				if(currentPiece != null && currentPiece.getType().equals(PieceType.KING)) {
+				if(currentPiece != null && currentPiece.getType().equals(PieceType.KING)
+						&& currentPiece.getColor().equals(color)) {
 					return square;
 				}				
 			}
