@@ -43,7 +43,7 @@ public class Rook  extends Piece {
 		for(int i = (-1) * (Board.SIZE - 1); i < Board.SIZE; i++) {
 			if(i != 0) {
 				Coordinate to = new Coordinate(from.getX(), from.getY() + i);
-				allPossibleMovesDirY = Piece.addIfValid(allPossibleMovesDirY, to);		
+				allPossibleMovesDirY.add(to);		
 			}
 		}
 		return allPossibleMovesDirY;
@@ -54,7 +54,7 @@ public class Rook  extends Piece {
 		for(int i = (-1) * (Board.SIZE - 1); i < Board.SIZE; i++) {
 			if(i != 0) {
 				Coordinate to = new Coordinate(from.getX() + i, from.getY());
-				allPossibleMovesDirX = Piece.addIfValid(allPossibleMovesDirX, to);		
+				allPossibleMovesDirX.add(to);		
 			}
 		}
 		return allPossibleMovesDirX;

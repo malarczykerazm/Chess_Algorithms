@@ -23,7 +23,7 @@ public class Bishop extends Piece {
 			for(int j = -1; j < 2; j++) {
 				if(i != 0 && j != 0) {
 					Coordinate to = new Coordinate(from.getX() + i, from.getY() + i*j);
-					allPossibleMoves = Piece.addIfValid(allPossibleMoves, to);					
+					allPossibleMoves.add(to);					
 				}				
 			}
 		}

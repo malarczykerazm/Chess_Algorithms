@@ -20,11 +20,8 @@ public abstract class Piece {
 	
 	public abstract List<Coordinate> possibleCaptureMoves(Coordinate from);
 	
-	public static List<Coordinate> addIfValid(List<Coordinate> list, Coordinate square) {
-		if(square.isValid()) {
-			list.add(square);
-		}
-		return list;
+	public List<Coordinate> possibleAttackMovesForFirstMove(Coordinate from) {
+		return possibleAttackMoves(from);
 	}
 	
 	public Color getColor() {

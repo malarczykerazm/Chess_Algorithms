@@ -46,7 +46,7 @@ public class King  extends Piece {
 			for(int j = -1; j < 2; j++) {
 				if(i != 0 && j != 0) {
 					Coordinate to = new Coordinate(from.getX() + i, from.getY() + i*j);
-					allPossibleMovesDiagonal = Piece.addIfValid(allPossibleMovesDiagonal, to);
+					allPossibleMovesDiagonal.add(to);
 				}				
 			}
 		}
@@ -58,7 +58,7 @@ public class King  extends Piece {
 		for(int i = -1; i < 2; i++) {
 			if(i != 0) {
 				Coordinate to = new Coordinate(from.getX(), from.getY() + 1 * i);
-				allPossibleMovesDirY = Piece.addIfValid(allPossibleMovesDirY, to);		
+				allPossibleMovesDirY.add(to);		
 			}
 		}
 		return allPossibleMovesDirY;
@@ -69,7 +69,7 @@ public class King  extends Piece {
 		for(int i = -1; i < 2; i++) {
 			if(i != 0) {
 				Coordinate to = new Coordinate(from.getX() + 1 * i, from.getY());
-				allPossibleMovesDirX = Piece.addIfValid(allPossibleMovesDirX, to);		
+				allPossibleMovesDirX.add(to);		
 			}
 		}
 		return allPossibleMovesDirX;

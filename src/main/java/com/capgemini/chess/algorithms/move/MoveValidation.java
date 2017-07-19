@@ -16,8 +16,17 @@ public class MoveValidation {
 	}
 	
 	public boolean isAttackValidWithoutConsideringCheck(Coordinate from, Coordinate to) {
+		if(!(from.isValid())) { return false; }
+		
+		if(!(to.isValid())) { return false; }
+		
 		Piece movedPiece = this.board.getPieceAt(from);
 		List<Coordinate> possibleAttacks = movedPiece.possibleAttackMoves(from);
+		
+		if(movedPiece.getType() == PieceType.PAWN && !(wasThePawnMoved(from))) {
+			possibleAttacks = movedPiece.possibleAttackMovesForFirstMove(from);
+		}
+		
 		for (Coordinate square : possibleAttacks) {
 			if(square.equals(to)) {
 				if (isAttackPossibleForDestination(to) && isTheWayFreeToGo(from, to)) {
@@ -30,6 +39,10 @@ public class MoveValidation {
 	
 	
 	public boolean isCaptureValidWithoutConsideringCheck(Coordinate from, Coordinate to) {
+		if(!(from.isValid())) { return false; }
+		
+		if(!(to.isValid())) { return false; }
+		
 		Piece movedPiece = this.board.getPieceAt(from);
 		List<Coordinate> possibleCaptures = movedPiece.possibleCaptureMoves(from);
 		for (Coordinate square : possibleCaptures) {
@@ -139,6 +152,14 @@ public class MoveValidation {
 			}
 		}
 		return true;
+	}
+	
+	private boolean wasThePawnMoved(Coordinate from) {
+		for(Move performedMove : this.board.getMoveHistory()) {
+			performedMove.getFrom().equals(from);
+			return true;
+		}
+		return false;
 	}
 
 }

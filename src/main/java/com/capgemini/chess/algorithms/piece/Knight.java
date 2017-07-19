@@ -22,9 +22,9 @@ public class Knight  extends Piece {
 			for(int j = -1; j < 2; j++) {
 				if(i != 0 && j != 0) {
 					Coordinate toShort = new Coordinate (from.getX() + 2 * i, from.getY() + 1 * j);
-					allPossibleMoves = Piece.addIfValid(allPossibleMoves, toShort);					
+					allPossibleMoves.add(toShort);					
 					Coordinate toLong = new Coordinate (from.getX() + 1 * i, from.getY() + 2 * j);
-					allPossibleMoves = Piece.addIfValid(allPossibleMoves, toLong);
+					allPossibleMoves.add(toLong);
 				}
 			}
 		}

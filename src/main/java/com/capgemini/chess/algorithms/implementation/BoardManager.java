@@ -250,7 +250,7 @@ public class BoardManager {
 			Move consideredMove = new AttackMove(from, to);
 			consideredMove.setMovedPiece(this.board.getPieceAt(from));
 			tempMoveHistory.add(consideredMove);
-			BoardManager tempBoardManager = new BoardManager(this.board);
+			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
 			Board tempBoard = tempBoardManager.getBoard();
 			if(tempBoardManager.isKingInCheck(tempBoard.getPieceAt(to).getColor())) {
 				throw new KingInCheckException();
