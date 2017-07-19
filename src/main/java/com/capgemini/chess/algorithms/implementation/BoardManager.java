@@ -327,9 +327,20 @@ public class BoardManager {
 	throw new InvalidColorException();
 	}
 
-	private boolean isAnyMoveValid(Color nextMoveColor) {
-
-		// TODO please add implementation here
+	private boolean isAnyMoveValid(Color nextMoveColor) throws InvalidColorException, NoKingException {
+		List<Coordinate> locationOfPieces = findAllPiecesOfColor(nextMoveColor);
+		for(Coordinate pieceLocation : locationOfPieces) {
+			for(int i = 0; i < Board.SIZE; i++) {
+				for(int j = 0; j < Board.SIZE; j++) {
+					try {
+						validateMove(pieceLocation, new Coordinate(i, j));
+						return true;
+					} catch (InvalidMoveException e) {
+						continue;
+					}
+				}
+			}
+		}
 
 		return false;
 	}
