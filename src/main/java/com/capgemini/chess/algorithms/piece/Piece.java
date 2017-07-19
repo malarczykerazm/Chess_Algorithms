@@ -18,7 +18,9 @@ public abstract class Piece {
 	
 	public abstract List<Coordinate> possibleAttackMoves(Coordinate from);
 	
-	public abstract List<Coordinate> possibleCaptureMoves(Coordinate from);
+	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
+		return possibleAttackMoves(from);
+	}
 	
 	public List<Coordinate> possibleAttackMovesForFirstMove(Coordinate from) {
 		return possibleAttackMoves(from);

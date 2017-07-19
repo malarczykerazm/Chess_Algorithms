@@ -242,38 +242,38 @@ public class BoardManager {
 		//TODO null?
 	}
 
-	public Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
+	private Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
 		MoveValidation moveVal = new MoveValidation(this.board);
 		
 		if(moveVal.isAttackValidWithoutConsideringCheck(from, to)) {
-			List<Move> tempMoveHistory = this.board.getMoveHistory();
 			Move consideredMove = new AttackMove(from, to);
 			consideredMove.setMovedPiece(this.board.getPieceAt(from));
-			tempMoveHistory.add(consideredMove);
-			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
-			Board tempBoard = tempBoardManager.getBoard();
-			if(tempBoardManager.isKingInCheck(tempBoard.getPieceAt(to).getColor())) {
+			tempPiecesSwap(from, to);
+			if(isKingInCheck(this.board.getPieceAt(to).getColor())) {
 				throw new KingInCheckException();
 			}
+			tempPiecesSwap(to, from);
 			return consideredMove;
 		}
 		
 		if(moveVal.isCaptureValidWithoutConsideringCheck(from, to)) {
-			List<Move> tempMoveHistory = this.board.getMoveHistory();
 			Move consideredMove = new CaptureMove(from, to);
 			consideredMove.setMovedPiece(this.board.getPieceAt(from));
-			tempMoveHistory.add(consideredMove);
-			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
-			Board tempBoard = tempBoardManager.getBoard();
-			if(tempBoardManager.isKingInCheck(tempBoard.getPieceAt(to).getColor())) {
+			tempPiecesSwap(from, to);
+			if(isKingInCheck(this.board.getPieceAt(to).getColor())) {
 				throw new KingInCheckException();
 			}
+			tempPiecesSwap(to, from);
 			return consideredMove;
 		}
 		throw new InvalidMoveException();
 		// TODO gdzie złapać wyjątek koloru
 	}
 
+	private void tempPiecesSwap(Coordinate from, Coordinate to) {
+		this.board.setPieceAt(this.board.getPieceAt(from), to);
+		this.board.setPieceAt(null, from);
+	}
 	
 	private boolean isKingInCheck(Color kingColor) throws InvalidColorException, NoKingException {
 	MoveValidation moveVal = new MoveValidation(this.board);

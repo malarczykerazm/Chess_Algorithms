@@ -32,11 +32,6 @@ public class Knight  extends Piece {
 	}
 	
 	@Override
-	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
-		return possibleAttackMoves(from);
-	}
-	
-	@Override
 	public PieceType getType() {
 		return type;
 	}

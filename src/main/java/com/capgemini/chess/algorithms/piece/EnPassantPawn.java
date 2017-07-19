@@ -21,11 +21,6 @@ public class EnPassantPawn extends Piece{
 	}
 	
 	@Override
-	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
-		return new ArrayList<Coordinate>();
-	}
-	
-	@Override
 	public PieceType getType() {
 		return type;
 	}

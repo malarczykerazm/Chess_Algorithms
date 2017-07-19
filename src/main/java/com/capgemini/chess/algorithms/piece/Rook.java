@@ -27,11 +27,6 @@ public class Rook  extends Piece {
 		}
 		return allPossibleMoves;
 	}
-
-	@Override
-	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
-		return possibleAttackMoves(from);
-	}
 	
 	@Override
 	public PieceType getType() {
