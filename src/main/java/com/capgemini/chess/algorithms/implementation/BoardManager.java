@@ -75,7 +75,6 @@ public class BoardManager {
 	public Move performMove(Coordinate from, Coordinate to) throws InvalidMoveException, InvalidColorException, NoKingException {
 
 		Move move = validateMove(from, to);
-		// TODO złapać wyjątek koloru?
 		addMove(move);
 
 		return move;
@@ -243,15 +242,15 @@ public class BoardManager {
 		//TODO null?
 	}
 
-	private Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
+	public Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
 		MoveValidation moveVal = new MoveValidation(this.board);
 		
-		if(moveVal.isAttackValidNotConsideringCheck(from, to)) {
+		if(moveVal.isAttackValidWithoutConsideringCheck(from, to)) {
 			List<Move> tempMoveHistory = this.board.getMoveHistory();
 			Move consideredMove = new AttackMove(from, to);
 			consideredMove.setMovedPiece(this.board.getPieceAt(from));
 			tempMoveHistory.add(consideredMove);
-			BoardManager tempBoardManager = new BoardManager(tempMoveHistory);
+			BoardManager tempBoardManager = new BoardManager(this.board);
 			Board tempBoard = tempBoardManager.getBoard();
 			if(tempBoardManager.isKingInCheck(tempBoard.getPieceAt(to).getColor())) {
 				throw new KingInCheckException();
@@ -259,7 +258,7 @@ public class BoardManager {
 			return consideredMove;
 		}
 		
-		if(moveVal.isCaptureValidNotConsideringCheck(from, to)) {
+		if(moveVal.isCaptureValidWithoutConsideringCheck(from, to)) {
 			List<Move> tempMoveHistory = this.board.getMoveHistory();
 			Move consideredMove = new CaptureMove(from, to);
 			consideredMove.setMovedPiece(this.board.getPieceAt(from));
@@ -278,8 +277,9 @@ public class BoardManager {
 	
 	private boolean isKingInCheck(Color kingColor) throws InvalidColorException, NoKingException {
 	MoveValidation moveVal = new MoveValidation(this.board);
+	Coordinate positionOfKing = findTheKing(kingColor);
 		for(Coordinate square : findAllPiecesOfColor(oppositeColor(kingColor))) {
-			if(moveVal.isCaptureValidNotConsideringCheck(square, findTheKing(kingColor))) {
+			if(moveVal.isCaptureValidWithoutConsideringCheck(square, positionOfKing)) {
 				return true;
 			}
 		}
@@ -293,7 +293,8 @@ public class BoardManager {
 		for(int i = 0; i < Board.SIZE; i++) {
 			for(int j = 0; j < Board.SIZE; j++) {
 				Coordinate square = new Coordinate(i, j);
-				if(this.board.getPieceAt(square).getColor() == color) {
+				Piece currentPiece = this.board.getPieceAt(square);
+				if(currentPiece != null && currentPiece.getColor().equals(color)) {
 					allPiecesOfColor.add(square);
 				}				
 			}
@@ -306,7 +307,8 @@ public class BoardManager {
 		for(int i = 0; i < Board.SIZE; i++) {
 			for(int j = 0; j < Board.SIZE; j++) {
 				Coordinate square = new Coordinate(i, j);
-				if(this.board.getPieceAt(square).getType() == PieceType.KING) {
+				Piece currentPiece = this.board.getPieceAt(square);
+				if(currentPiece != null && currentPiece.getType().equals(PieceType.KING)) {
 					return square;
 				}				
 			}

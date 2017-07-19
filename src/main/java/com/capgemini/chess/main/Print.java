@@ -36,7 +36,7 @@ public class Print {
 	}
 	
 		private static String[][] setSinglePieceOnBoard(Piece piece, Coordinate from) {
-			List<Coordinate> list = piece.possibleAttackMoves(from);
+			List<Coordinate> list = piece.possibleCaptureMoves(from);
 			String[][] board = new String[Board.SIZE][Board.SIZE];
 			
 			for(Coordinate coord : list) {
