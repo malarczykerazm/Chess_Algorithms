@@ -275,6 +275,8 @@ public class BoardManager {
 			throw new InvalidMoveException("Next color to perform move is" + calculateNextMoveColor() + "!");
 		}
 		
+		//Move move = createTheMove(from, to);
+		
 		MoveValidation moveVal = new MoveValidation(this.board);
 		
 		if(moveVal.isAttackValidWithoutConsideringCheck(from, to)) {
@@ -339,9 +341,33 @@ public class BoardManager {
 		}
 		
 		throw new InvalidMoveException();
-		// TODO gdzie złapać wyjątek koloru
 	}
 
+	private Move createTheMove(Coordinate from, Coordinate to) throws InvalidMoveException {
+		Move testMove = new AttackMove(from, to);
+		
+		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
+			return testMove;
+		}
+		
+		testMove = (CaptureMove) testMove;
+		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
+			return testMove;
+		}
+		
+		testMove = (CastlingMove) testMove;
+		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
+			return testMove;
+		}
+		
+		testMove = (EnPassantMove) testMove;
+		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
+			return testMove;
+		}
+		
+		throw new InvalidMoveException();
+	}
+	
 	private void tempPiecesSwap(Coordinate from, Coordinate to) {
 		this.board.setPieceAt(this.board.getPieceAt(from), to);
 		this.board.setPieceAt(null, from);
