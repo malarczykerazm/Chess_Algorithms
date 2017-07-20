@@ -56,32 +56,32 @@ public class Pawn extends Piece {
 	private List<Coordinate> possibleAttackMovesWhite(Coordinate from) {
 		List<Coordinate> allPossibleAttackMovesWhite = new ArrayList<Coordinate>();
 		Coordinate to = new Coordinate (from.getX(), from.getY() + 1);
-		allPossibleAttackMovesWhite.add(to);
+		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to);
 		return allPossibleAttackMovesWhite;
 	}
 	
 	private List<Coordinate> possibleAttackMovesBlack(Coordinate from) {
 		List<Coordinate> allPossibleAttackMovesBlack = new ArrayList<Coordinate>();
 		Coordinate to = new Coordinate (from.getX(), from.getY() - 1);
-		allPossibleAttackMovesBlack.add(to);
+		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to);
 		return allPossibleAttackMovesBlack;
 	}	
 	
 	private List<Coordinate> possibleCaptureMovesWhite(Coordinate from) {
 		List<Coordinate> allPossibleCaptureMovesWhite = new ArrayList<Coordinate>();
 		Coordinate toRight = new Coordinate(from.getX() + 1, from.getY() + 1);
-		allPossibleCaptureMovesWhite.add(toRight);
+		allPossibleCaptureMovesWhite = addIfValid(allPossibleCaptureMovesWhite, toRight);
 		Coordinate toLeft = new Coordinate(from.getX() - 1, from.getY() + 1);
-		allPossibleCaptureMovesWhite.add(toLeft);
+		allPossibleCaptureMovesWhite = addIfValid(allPossibleCaptureMovesWhite, toLeft);;
 		return allPossibleCaptureMovesWhite;
 	}
 	
 	private List<Coordinate> possibleCaptureMovesBlack(Coordinate from) {
 		List<Coordinate> allPossibleCaptureMovesBlack = new ArrayList<Coordinate>();
 		Coordinate toRight = new Coordinate(from.getX() - 1, from.getY() - 1);
-		allPossibleCaptureMovesBlack.add(toRight);
+		allPossibleCaptureMovesBlack = addIfValid(allPossibleCaptureMovesBlack, toRight);
 		Coordinate toLeft = new Coordinate(from.getX() + 1, from.getY() - 1);
-		allPossibleCaptureMovesBlack.add(toLeft);
+		allPossibleCaptureMovesBlack = addIfValid(allPossibleCaptureMovesBlack, toLeft);
 		return allPossibleCaptureMovesBlack;
 	}
 	
@@ -89,8 +89,8 @@ public class Pawn extends Piece {
 		List<Coordinate> allPossibleAttackMovesWhite = new ArrayList<Coordinate>();
 		Coordinate to1 = new Coordinate (from.getX(), from.getY() + 1);
 		Coordinate to2 = new Coordinate (from.getX(), from.getY() + 2);
-		allPossibleAttackMovesWhite.add(to1);
-		allPossibleAttackMovesWhite.add(to2);
+		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to1);
+		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to2);
 		return allPossibleAttackMovesWhite;
 	}
 	
@@ -98,8 +98,8 @@ public class Pawn extends Piece {
 		List<Coordinate> allPossibleAttackMovesBlack = new ArrayList<Coordinate>();
 		Coordinate to1 = new Coordinate (from.getX(), from.getY() - 1);
 		Coordinate to2 = new Coordinate (from.getX(), from.getY() - 2);
-		allPossibleAttackMovesBlack.add(to1);
-		allPossibleAttackMovesBlack.add(to2);
+		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to1);
+		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to2);
 		return allPossibleAttackMovesBlack;
 	}	
 

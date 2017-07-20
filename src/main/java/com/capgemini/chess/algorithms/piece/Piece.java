@@ -29,6 +29,13 @@ public abstract class Piece {
 	public Color getColor() {
 		return this.color;
 	}
+	
+	public List<Coordinate> addIfValid(List<Coordinate> coordinates, Coordinate square) {
+		if(square.isValid()) {
+			coordinates.add(square);
+		}
+		return coordinates;
+	}
 
 	@Override
 	public boolean equals(Object obj) {

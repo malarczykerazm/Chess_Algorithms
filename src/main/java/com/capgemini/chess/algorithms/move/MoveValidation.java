@@ -5,6 +5,7 @@ import java.util.List;
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.piece.King;
 import com.capgemini.chess.algorithms.piece.Piece;
 
 public class MoveValidation {
@@ -19,7 +20,7 @@ public class MoveValidation {
 		Piece movedPiece = this.board.getPieceAt(from);
 		List<Coordinate> possibleAttacks = movedPiece.possibleAttackMoves(from);
 		
-		if(movedPiece.getType() == PieceType.PAWN && isThisTheFirstMoveOfThePawn(from)) {
+		if(isThisTheFirstMoveOfThePawn(from)) {
 			possibleAttacks = movedPiece.possibleAttackMovesForFirstMove(from);
 		}
 		
@@ -47,20 +48,73 @@ public class MoveValidation {
 		}
 		return false;
 	}
+	
+	public boolean isCastlingValidWithoutConsideringCheck(Coordinate from, Coordinate to) {
+
+		if(!(isThisTheFirstMoveOfTheKing(from))) {
+			return false;
+		}
+		
+		List<Coordinate> possibleMoves = ((King) this.board.getPieceAt(from)).possibleCastlingMoves(from);
+		
+		int i = 0;
+		for (Coordinate square : possibleMoves) {
+			if(square.equals(to)) {
+				i++;
+			}
+		}
+		
+		if(i == 0) {
+			return false;
+		}
+		
+		if(!(isTheWayFreeForCastling(from, to))) {
+			return false;
+		}
+		
+		if(to.getX() >= from.getX()) {
+			return isThisTheFirstMoveOfTheRook(new Coordinate((Board.SIZE - 1), from.getY()));
+		} else {
+			if(this.board.getPieceAt(new Coordinate(1, from.getY())) != null) {
+				return false;
+			}
+			return isThisTheFirstMoveOfTheRook(new Coordinate(0, from.getY()));
+		}
+	}
+	
+	public boolean isEnPassantValidWithoutConsideringCheck(Coordinate from, Coordinate to) {
+		Piece movedPiece = this.board.getPieceAt(from);
+		List<Coordinate> possibleCaptures = movedPiece.possibleCaptureMoves(from);
+		
+		for (Coordinate square : possibleCaptures) {
+			if(square.equals(to)) {
+				if(isEnPassantPossibleForDestination(from, to)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	private boolean isAttackPossibleForDestination(Coordinate to) {
 		Piece pieceOnDestinationSquare = this.board.getPieceAt(to);
-		if (pieceOnDestinationSquare == null ) {
-			return true;
-		}
-		return false;
+		return (pieceOnDestinationSquare == null );
 	}
 
 	private boolean isCapturePossibleForDestination(Coordinate from, Coordinate to) {
 		Piece movedPiece = this.board.getPieceAt(from);
 		Piece pieceOnDestinationSquare = this.board.getPieceAt(to);
 		if (pieceOnDestinationSquare != null && movedPiece.getColor() != pieceOnDestinationSquare.getColor()) {
-			return true;
+			return (pieceOnDestinationSquare.getType() != PieceType.EN_PASSANT_PAWN);
+		}
+		return false;
+	}
+	
+	private boolean isEnPassantPossibleForDestination(Coordinate from, Coordinate to) {
+		Piece movedPiece = this.board.getPieceAt(from);
+		Piece pieceOnDestinationSquare = this.board.getPieceAt(to);
+		if (pieceOnDestinationSquare != null && movedPiece.getColor() != pieceOnDestinationSquare.getColor()) {
+			return (pieceOnDestinationSquare.getType() == PieceType.EN_PASSANT_PAWN);
 		}
 		return false;
 	}
@@ -68,20 +122,20 @@ public class MoveValidation {
 	private boolean isTheWayFreeToGo(Coordinate from, Coordinate to) {
 		Piece movedPiece = this.board.getPieceAt(from);
 		if (movedPiece.getType() == PieceType.BISHOP) {
-			return checkIfTheWayIsFreeDiagonal(from, to);
+			return isTheWayFreeDiagonal(from, to);
 		}
 		if (movedPiece.getType() == PieceType.ROOK) {
-			if (checkIfTheWayIsFreeDirX(from, to) 
-				&& checkIfTheWayIsFreeDirY(from, to)) {
+			if (isTheWayFreeDirX(from, to) 
+				&& isTheWayFreeDirY(from, to)) {
 				return true;
 			} else {
 				return false;
 			}
 		}
 		if (movedPiece.getType() == PieceType.QUEEN) {
-			if (checkIfTheWayIsFreeDirX(from, to)
-					&& checkIfTheWayIsFreeDirY(from, to) 
-					&& checkIfTheWayIsFreeDiagonal(from, to)) {
+			if (isTheWayFreeDirX(from, to)
+					&& isTheWayFreeDirY(from, to) 
+					&& isTheWayFreeDiagonal(from, to)) {
 				return true;
 			} else {
 				return false;
@@ -90,7 +144,7 @@ public class MoveValidation {
 		return true;
 	}
 
-	private boolean checkIfTheWayIsFreeDirX(Coordinate from, Coordinate to) {
+	private boolean isTheWayFreeDirX(Coordinate from, Coordinate to) {
 		int start = from.getX();
 		int stop = to.getX();
 		if(start == stop) {
@@ -108,7 +162,7 @@ public class MoveValidation {
 		return true;
 	}
 
-	private boolean checkIfTheWayIsFreeDirY(Coordinate from, Coordinate to) {
+	private boolean isTheWayFreeDirY(Coordinate from, Coordinate to) {
 		int start = from.getY();
 		int stop = to.getY();
 		if(start == stop) {
@@ -126,7 +180,7 @@ public class MoveValidation {
 		return true;
 	}
 
-	private boolean checkIfTheWayIsFreeDiagonal(Coordinate from, Coordinate to) {
+	private boolean isTheWayFreeDiagonal(Coordinate from, Coordinate to) {
 		int startX = from.getX();
 		int stopX = to.getX();
 		int startY = from.getY();
@@ -157,6 +211,41 @@ public class MoveValidation {
 			return !(wasThePieceMoved(from));				
 		}
 		return false;
+	}
+	
+	private boolean isThisTheFirstMoveOfTheKing(Coordinate from) {
+		if(this.board.getPieceAt(from).getType() != PieceType.KING) {
+			return false;
+		}
+		if(!(from.equals(new Coordinate(4, 0)) || from.equals(new Coordinate(4, 7)))) {
+			return false;
+		}
+		return !(wasThePieceMoved(from));
+	}
+	
+	private boolean isThisTheFirstMoveOfTheRook(Coordinate from) {
+		if(this.board.getPieceAt(from) == null || this.board.getPieceAt(from).getType() != PieceType.ROOK) {
+			return false;
+		}
+		return !(wasThePieceMoved(from));
+	}
+	
+	private boolean isTheWayFreeForCastling(Coordinate from, Coordinate to) {
+		int start = from.getX();
+		int stop = to.getX();
+		if(start == stop) {
+			return true;
+		}
+		int absDistance = Math.abs(stop - start);
+		int direction = (stop - start) / absDistance;
+		for (int i = 1; i <= absDistance; i++) {
+			Coordinate squareOnTheWay = new Coordinate(from.getX() + i * direction, from.getY());
+			if (this.board.getPieceAt(squareOnTheWay) != null) {
+				return false;
+			}
+		}
+		return true;
+		
 	}
 	
 	private boolean wasThePieceMoved(Coordinate from) {

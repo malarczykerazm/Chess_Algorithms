@@ -19,14 +19,14 @@ public class Queen  extends Piece {
 	@Override
 	public List<Coordinate> possibleAttackMoves(Coordinate from) {
 		List<Coordinate> allPossibleMoves = new ArrayList<Coordinate>();
-		for(Coordinate move : possibleAttackMovesDiagonal(from)) {
-			allPossibleMoves.add(move);
+		for(Coordinate to : possibleAttackMovesDiagonal(from)) {
+			allPossibleMoves = addIfValid(allPossibleMoves, to);
 		}
-		for(Coordinate move : possibleAttackMovesDirY(from)) {
-			allPossibleMoves.add(move);
+		for(Coordinate to : possibleAttackMovesDirY(from)) {
+			allPossibleMoves = addIfValid(allPossibleMoves, to);
 		}
-		for(Coordinate move : possibleAttackMovesDirX(from)) {
-			allPossibleMoves.add(move);
+		for(Coordinate to : possibleAttackMovesDirX(from)) {
+			allPossibleMoves = addIfValid(allPossibleMoves, to);
 		}
 		return allPossibleMoves;
 	}
@@ -42,7 +42,7 @@ public class Queen  extends Piece {
 			for(int j = -1; j < 2; j++) {
 				if(i != 0 && j != 0) {
 					Coordinate to = new Coordinate(from.getX() + i, from.getY() + i * j);
-					allPossibleMovesDiagonal.add(to);
+					allPossibleMovesDiagonal = addIfValid(allPossibleMovesDiagonal, to);
 				}				
 			}
 		}
@@ -54,7 +54,7 @@ public class Queen  extends Piece {
 		for(int i = (-1) * (Board.SIZE - 1); i < Board.SIZE; i++) {
 			if(i != 0) {
 				Coordinate to = new Coordinate(from.getX(), from.getY() + i);
-				allPossibleMovesDirY.add(to);		
+				allPossibleMovesDirY = addIfValid(allPossibleMovesDirY, to);		
 			}
 		}
 		return allPossibleMovesDirY;
@@ -65,7 +65,7 @@ public class Queen  extends Piece {
 		for(int i = (-1) * (Board.SIZE - 1); i < Board.SIZE; i++) {
 			if(i != 0) {
 				Coordinate to = new Coordinate(from.getX() + i, from.getY());
-				allPossibleMovesDirX.add(to);
+				allPossibleMovesDirX = addIfValid(allPossibleMovesDirX, to);
 			}
 		}
 		return allPossibleMovesDirX;

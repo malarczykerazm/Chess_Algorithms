@@ -75,7 +75,6 @@ public class BoardManagerTest {
 		Move move = new AttackMove(null, null);
 		move.setFrom(new Coordinate(5, 1));
 		move.setTo(new Coordinate(5, 3));
-		//move.setType(MoveType.ATTACK);
 		moves.add(move);
 		
 		// when
@@ -94,7 +93,6 @@ public class BoardManagerTest {
 		Move move = new CaptureMove(null, null);
 		move.setFrom(new Coordinate(0, 0));
 		move.setTo(new Coordinate(0, 6));
-		//move.setType(MoveType.CAPTURE);
 		moves.add(move);
 		
 		// when
@@ -113,7 +111,6 @@ public class BoardManagerTest {
 		Move move = new CastlingMove(null, null);
 		move.setFrom(new Coordinate(4, 0));
 		move.setTo(new Coordinate(2, 0));
-		//move.setType(MoveType.CASTLING);
 		moves.add(move);
 		
 		// when
@@ -133,17 +130,17 @@ public class BoardManagerTest {
 		Move move1 = new AttackMove(null, null);
 		move1.setFrom(new Coordinate(1, 1));
 		move1.setTo(new Coordinate(1, 4));
-		//move1.setType(MoveType.ATTACK);
+		
 		moves.add(move1);
 		Move move2 = new AttackMove(null, null);
 		move2.setFrom(new Coordinate(2, 6));
 		move2.setTo(new Coordinate(2, 4));
-		//move2.setType(MoveType.ATTACK);
+		
 		moves.add(move2);
 		Move move3 = new EnPassantMove(null, null);
 		move3.setFrom(new Coordinate(1, 4));
 		move3.setTo(new Coordinate(2, 5));
-		//move3.setType(MoveType.EN_PASSANT);
+		
 		moves.add(move3);
 		
 		// when
@@ -164,7 +161,6 @@ public class BoardManagerTest {
 		Move move = new CaptureMove(null, null);
 		move.setFrom(new Coordinate(1, 6));
 		move.setTo(new Coordinate(1, 0));
-		//move.setType(MoveType.CAPTURE);
 		moves.add(move);
 
 		// when
@@ -305,6 +301,9 @@ public class BoardManagerTest {
 		board.getMoveHistory().add(createDummyMove(board));
 		board.setPieceAt(new Pawn(Color.WHITE), new Coordinate(1, 4));
 		board.setPieceAt(new Pawn(Color.BLACK), new Coordinate(2, 6));
+			// King added to make the test possible to run
+			board.setPieceAt(new King(Color.WHITE), new Coordinate(7, 7));
+			board.setPieceAt(new King(Color.BLACK), new Coordinate(7, 0));
 		boardManager.performMove(new Coordinate(2, 6), new Coordinate(2, 4));
 		
 		// when
