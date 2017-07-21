@@ -21,17 +21,16 @@ public enum Level {
 	
 	private final int value;
 	private final int pointsRequired;
-    private final int gamesRequired;
-    private final double winsRequired;
+	private final int gamesRequired;
+	private final double winsRequired;
 
-    Level(int value, int pointsRequired, int gamesRequired,
-    		double winsRequired) {
-    	this.value = value;
-        this.pointsRequired = pointsRequired;
-        this.gamesRequired = gamesRequired;
-        this.winsRequired = winsRequired;
-    }
-    
+	Level(int value, int pointsRequired, int gamesRequired, double winsRequired) {
+		this.value = value;
+		this.pointsRequired = pointsRequired;
+		this.gamesRequired = gamesRequired;
+		this.winsRequired = winsRequired;
+	}
+
 	public int getValue() {
 		return value;
 	}
@@ -47,14 +46,13 @@ public enum Level {
 	public double getWinsRequired() {
 		return winsRequired;
 	}
-	
+
 	public static Level getLevelByValue(int value) {
-		for(Level level : Level.values())
-	    {
-	        if(level.getValue() == value) {
-	        	return level;
-	        }
-	    }
-	    return null;
+		for (Level level : Level.values()) {
+			if (level.getValue() == value) {
+				return level;
+			}
+		}
+		return null;
 	}
 }

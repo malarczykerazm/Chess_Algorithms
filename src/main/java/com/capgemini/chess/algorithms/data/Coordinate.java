@@ -19,15 +19,9 @@ public class Coordinate {
 		this.y = y;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + x;
-		result = prime * result + y;
-		return result;
-	}
-
+	/**
+	 * overrides the equals method of Object class to make some tests possible to run
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -43,35 +37,42 @@ public class Coordinate {
 			return false;
 		return true;
 	}
-	
+
+	/**
+	 * validates the coordinates with accordance to the board size
+	 * @throws InvalidMoveException in case of invalid coordinate
+	 */
 	public void coordinateValidator() throws InvalidMoveException {
-		if(!(this.isValid())) {
+		if (!(this.isValid())) {
 			throw new InvalidMoveException("The coordinates of the move are invalid!");
 		}
 	}
-	
+
+	/**
+	 * checks it the coordinate fits the bounds of the board
+	 * @return a boolean (true for a coordinate in the board and false otherwise)
+	 */
 	public boolean isValid() {
-		if(this.getX() <= Board.SIZE - 1 && this.getY() <= Board.SIZE - 1
-			&& this.getX() >= 0 && this.getY() >= 0) {
-		return true;	
+		if (this.getX() <= Board.SIZE - 1 && this.getY() <= Board.SIZE - 1 && this.getX() >= 0 && this.getY() >= 0) {
+			return true;
 		}
 		return false;
 	}
-	
+
 	public int getX() {
 		return x;
 	}
-	
+
 	public void setX(int x) {
 		this.x = x;
 	}
-	
+
 	public int getY() {
 		return y;
 	}
-	
+
 	public void setY(int y) {
 		this.y = y;
 	}
-	
+
 }

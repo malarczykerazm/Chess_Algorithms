@@ -67,7 +67,8 @@ public class BoardManager {
 	 * @throws InvalidMoveException
 	 *             in case move is not valid
 	 */
-	public Move performMove(Coordinate from, Coordinate to) throws InvalidMoveException, InvalidColorException, NoKingException {
+	public Move performMove(Coordinate from, Coordinate to)
+			throws InvalidMoveException, InvalidColorException, NoKingException {
 
 		Move move = validateMove(from, to);
 		addMove(move);
@@ -172,18 +173,16 @@ public class BoardManager {
 		}
 
 		this.board.getMoveHistory().add(move);
-		
-		if(isThereAnEnPassantPawnAnywhere()) {
+
+		if (isThereAnEnPassantPawnAnywhere()) {
 			getRidOfTheEnPassantPawn();
 		}
-		
+
 		setNewEnPassantPawnIfNeeded();
-		
+
 		changeFirstMovePawnIntoRegularPawnIfNeeded();
-		
-		}
-		//TODO Naprawic babole? Wyrzucac constanty do osobnej klasy i tu tylko importowac? 
-		
+
+	}
 
 	private void addRegularMove(Move move) {
 		Piece movedPiece = this.board.getPieceAt(move.getFrom());
@@ -217,21 +216,32 @@ public class BoardManager {
 		this.board.setPieceAt(null, lastMove.getTo());
 	}
 
-	private Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
-		
+	/**
+	 * validates the move with accordance to chess rules
+	 * @param from start coordinate of the considering
+	 * @param to end coordinate of the considering move
+	 * @return the move if considered as valid
+	 * @throws InvalidMoveException in case the move is not valid
+	 * @throws KingInCheckException in case of the check on the own king caused by considered move
+	 * @throws InvalidColorException in case of a colour of a piece other then black or white
+	 * @throws NoKingException in case there is no king of a certain colour on the board
+	 */
+	private Move validateMove(Coordinate from, Coordinate to)
+			throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
+
 		preValidateMove(from, to);
-		
+
 		Move consideredMove = Move.generateMove(this.board, from, to);
 		consideredMove.setMovedPiece(this.board.getPieceAt(from));
-		
+
 		consideredMove.validateMoveWithoutConsideringCheck(this.board);
-		
-		if(consideredMove.getType() == MoveType.CASTLING) {
-			checkIfKingWouldBeInCheckOnItsWayForCastling(consideredMove);			
+
+		if (consideredMove.getType() == MoveType.CASTLING) {
+			checkIfKingWouldBeInCheckOnItsWayForCastling(consideredMove);
 		} else {
 			checkIfKingWouldBeInCheck(consideredMove);
 		}
-	
+
 		return consideredMove;
 	}
 
@@ -243,39 +253,42 @@ public class BoardManager {
 	}
 
 	private void nextTurnColorValidator(Coordinate from) throws InvalidMoveException {
-		if(this.board.getPieceAt(from).getColor() != calculateNextMoveColor()) {
+		if (this.board.getPieceAt(from).getColor() != calculateNextMoveColor()) {
 			throw new InvalidMoveException("Next color to perform move is" + calculateNextMoveColor() + "!");
 		}
 	}
 
 	private void startSquareValidator(Coordinate from) throws InvalidMoveException {
-		if(this.board.getPieceAt(from) == null || this.board.getPieceAt(from).getType() == PieceType.EN_PASSANT_PAWN) {
+		if (this.board.getPieceAt(from) == null || this.board.getPieceAt(from).getType() == PieceType.EN_PASSANT_PAWN) {
 			throw new InvalidMoveException("The start square is empty!");
 		}
 	}
-	
+
 	private void tempPiecesSwap(Coordinate from, Coordinate to) {
 		this.board.setPieceAt(this.board.getPieceAt(from), to);
 		this.board.setPieceAt(null, from);
 	}
-	
-	private void checkIfKingWouldBeInCheck(Move move) throws InvalidColorException, NoKingException, InvalidMoveException {
+
+	private void checkIfKingWouldBeInCheck(Move move)
+			throws InvalidColorException, NoKingException, InvalidMoveException {
 		tempPiecesSwap(move.getFrom(), move.getTo());
-		if(isKingInCheck(move.getMovedPiece().getColor())) {
+		if (isKingInCheck(move.getMovedPiece().getColor())) {
 			tempPiecesSwap(move.getTo(), move.getFrom());
 			throw new KingInCheckException();
 		}
 		tempPiecesSwap(move.getTo(), move.getFrom());
 	}
-	
-	private void checkIfKingWouldBeInCheckOnItsWayForCastling(Move move) throws InvalidMoveException, InvalidColorException, NoKingException {
+
+	private void checkIfKingWouldBeInCheckOnItsWayForCastling(Move move)
+			throws InvalidMoveException, InvalidColorException, NoKingException {
 		Coordinate tempTo = new Coordinate(move.getFrom().getX(), move.getFrom().getY());
-		int direction = (move.getTo().getX() - move.getFrom().getX()) / Math.abs(move.getTo().getX() - move.getFrom().getX());
-				
-		for(int i = 1; i <= Math.abs(move.getTo().getX() - move.getFrom().getX()); i++) {
+		int direction = (move.getTo().getX() - move.getFrom().getX())
+				/ Math.abs(move.getTo().getX() - move.getFrom().getX());
+
+		for (int i = 1; i <= Math.abs(move.getTo().getX() - move.getFrom().getX()); i++) {
 			tempTo.setX(move.getFrom().getX() + i * direction);
 			tempPiecesSwap(move.getFrom(), tempTo);
-			if(isKingInCheck(this.board.getPieceAt(tempTo).getColor())) {
+			if (isKingInCheck(this.board.getPieceAt(tempTo).getColor())) {
 				tempPiecesSwap(tempTo, move.getFrom());
 				throw new KingInCheckException();
 			}
@@ -285,64 +298,64 @@ public class BoardManager {
 
 	private boolean isKingInCheck(Color kingColor) throws InvalidColorException, NoKingException {
 		Coordinate positionOfKing = findTheKing(kingColor);
-			for(Coordinate square : findAllPiecesOfColor(oppositeColor(kingColor))) {
-				Move move = new CaptureMove(square, positionOfKing);
-				try {
+		for (Coordinate square : findAllPiecesOfColor(oppositeColor(kingColor))) {
+			Move move = new CaptureMove(square, positionOfKing);
+			try {
 				move.validateMoveWithoutConsideringCheck(this.board);
 				return true;
-			} catch(InvalidMoveException e) {
+			} catch (InvalidMoveException e) {
 				continue;
 			}
 		}
 		return false;
 	}
-	
+
 	private List<Coordinate> findAllPiecesOfColor(Color color) {
 		List<Coordinate> allPiecesOfColor = new ArrayList<Coordinate>();
-		for(int i = 0; i < Board.SIZE; i++) {
-			for(int j = 0; j < Board.SIZE; j++) {
+		for (int i = 0; i < Board.SIZE; i++) {
+			for (int j = 0; j < Board.SIZE; j++) {
 				Coordinate square = new Coordinate(i, j);
 				Piece currentPiece = this.board.getPieceAt(square);
-				if(currentPiece != null && currentPiece.getColor().equals(color)) {
+				if (currentPiece != null && currentPiece.getColor().equals(color)) {
 					allPiecesOfColor.add(square);
 				}
-				if(allPiecesOfColor.size() == 2 * Board.SIZE) {
+				if (allPiecesOfColor.size() == 2 * Board.SIZE) {
 					return allPiecesOfColor;
 				}
 			}
 		}
 		return allPiecesOfColor;
 	}
-	
+
 	private Coordinate findTheKing(Color color) throws NoKingException {
-		for(int i = 0; i < Board.SIZE; i++) {
-			for(int j = 0; j < Board.SIZE; j++) {
+		for (int i = 0; i < Board.SIZE; i++) {
+			for (int j = 0; j < Board.SIZE; j++) {
 				Coordinate square = new Coordinate(i, j);
 				Piece currentPiece = this.board.getPieceAt(square);
-				if(currentPiece != null && currentPiece.getType().equals(PieceType.KING)
+				if (currentPiece != null && currentPiece.getType().equals(PieceType.KING)
 						&& currentPiece.getColor().equals(color)) {
 					return square;
-				}				
+				}
 			}
 		}
 		throw new NoKingException();
 	}
-	
+
 	private Color oppositeColor(Color color) throws InvalidColorException {
-		if(color == Color.WHITE) {
+		if (color == Color.WHITE) {
 			return Color.BLACK;
 		}
-		if(color == Color.BLACK) {
+		if (color == Color.BLACK) {
 			return Color.WHITE;
 		}
-	throw new InvalidColorException();
+		throw new InvalidColorException();
 	}
 
 	private boolean isAnyMoveValid(Color nextMoveColor) throws InvalidColorException, NoKingException {
 		List<Coordinate> locationOfPieces = findAllPiecesOfColor(nextMoveColor);
-		for(Coordinate pieceLocation : locationOfPieces) {
-			for(int i = 0; i < Board.SIZE; i++) {
-				for(int j = 0; j < Board.SIZE; j++) {
+		for (Coordinate pieceLocation : locationOfPieces) {
+			for (int i = 0; i < Board.SIZE; i++) {
+				for (int j = 0; j < Board.SIZE; j++) {
 					try {
 						validateMove(pieceLocation, new Coordinate(i, j));
 						return true;
@@ -376,12 +389,12 @@ public class BoardManager {
 		}
 		return lastNonAttackMoveIndex;
 	}
-	
+
 	private boolean isThereAnEnPassantPawnAnywhere() {
-		for(int i = 0; i < Board.SIZE; i++) {
-			for(int j = 0; j < Board.SIZE; j++) {
-				Coordinate square = new Coordinate (i, j);
-				if(this.board.getPieceAt(square) != null
+		for (int i = 0; i < Board.SIZE; i++) {
+			for (int j = 0; j < Board.SIZE; j++) {
+				Coordinate square = new Coordinate(i, j);
+				if (this.board.getPieceAt(square) != null
 						&& this.board.getPieceAt(square).getType() == PieceType.EN_PASSANT_PAWN) {
 					return true;
 				}
@@ -389,12 +402,15 @@ public class BoardManager {
 		}
 		return false;
 	}
-	
+
+	/**
+	 * deletes the EnPassantPawn object if it was not captured in one turn of the game
+	 */
 	private void getRidOfTheEnPassantPawn() {
-		for(int i = 0; i < Board.SIZE; i++) {
-			for(int j = 0; j < Board.SIZE; j++) {
-				Coordinate square = new Coordinate (i, j);
-				if(this.board.getPieceAt(square) != null
+		for (int i = 0; i < Board.SIZE; i++) {
+			for (int j = 0; j < Board.SIZE; j++) {
+				Coordinate square = new Coordinate(i, j);
+				if (this.board.getPieceAt(square) != null
 						&& this.board.getPieceAt(square).getType() == PieceType.EN_PASSANT_PAWN) {
 					this.board.setPieceAt(null, square);
 					break;
@@ -402,24 +418,30 @@ public class BoardManager {
 			}
 		}
 	}
-	
+
+	/**
+	 * sets an artificial representation of a piece on the board, 
+	 * so it can be captured in next turn in case of ae En Passant move
+	 */
 	private void setNewEnPassantPawnIfNeeded() {
 		Move lastMove = this.board.getMoveHistory().get(this.board.getMoveHistory().size() - 1);
 		int lastMoveLength = lastMove.getTo().getY() - lastMove.getFrom().getY();
-		if(lastMove.getType() == MoveType.ATTACK
-				&& lastMove.getMovedPiece() != null
-				&& lastMove.getMovedPiece().getType() == PieceType.PAWN
-				&& Math.abs(lastMoveLength) == 2) {
+		if (lastMove.getType() == MoveType.ATTACK && lastMove.getMovedPiece() != null
+				&& lastMove.getMovedPiece().getType() == PieceType.PAWN && Math.abs(lastMoveLength) == 2) {
 			Piece shadowPawn = new EnPassantPawn(lastMove.getMovedPiece().getColor());
-			Coordinate shadowPawnLocation = new Coordinate(lastMove.getFrom().getX(), lastMove.getFrom().getY() + lastMoveLength / 2);
+			Coordinate shadowPawnLocation = new Coordinate(lastMove.getFrom().getX(),
+					lastMove.getFrom().getY() + lastMoveLength / 2);
 			this.board.setPieceAt(shadowPawn, shadowPawnLocation);
 		}
 	}
-	
+
+	/**
+	 * change the Pawn object, that can perform a two steps attack 
+	 * into a regular pawn after its first move
+	 */
 	private void changeFirstMovePawnIntoRegularPawnIfNeeded() {
 		Move lastMove = this.board.getMoveHistory().get(this.board.getMoveHistory().size() - 1);
-		if(lastMove.getType() == MoveType.ATTACK
-				&& lastMove.getMovedPiece() != null
+		if (lastMove.getType() == MoveType.ATTACK && lastMove.getMovedPiece() != null
 				&& lastMove.getMovedPiece().getType() == PieceType.PAWN) {
 			this.board.setPieceAt(new PawnAfterFirstMove(lastMove.getMovedPiece().getColor()), lastMove.getTo());
 		}

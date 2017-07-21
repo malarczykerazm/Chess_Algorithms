@@ -1,7 +1,7 @@
 package com.capgemini.chess.algorithms.implementation.exceptions;
 
 /**
- * Exception which if thrown in case players king will after performing his move 
+ * Exception which if thrown in case players king will after performing his move
  * 
  * @author Michal Bejm
  *
@@ -9,7 +9,10 @@ package com.capgemini.chess.algorithms.implementation.exceptions;
 public class KingInCheckException extends InvalidMoveException {
 
 	private static final long serialVersionUID = -7109029342454067452L;
-	
+
+	/**
+	 * an exception with the initial message
+	 */
 	public KingInCheckException() {
 		super("King must not be checked!");
 	}

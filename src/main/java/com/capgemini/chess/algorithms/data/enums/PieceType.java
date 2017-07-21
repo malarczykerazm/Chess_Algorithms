@@ -7,11 +7,5 @@ package com.capgemini.chess.algorithms.data.enums;
  *
  */
 public enum PieceType {
-	KING,
-    QUEEN,
-    BISHOP,
-    KNIGHT,
-    ROOK,
-    PAWN,
-	EN_PASSANT_PAWN;
+	KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN, EN_PASSANT_PAWN;
 }

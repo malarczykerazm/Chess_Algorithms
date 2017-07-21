@@ -10,14 +10,22 @@ import com.capgemini.chess.algorithms.piece.Pawn;
 import com.capgemini.chess.algorithms.piece.Queen;
 import com.capgemini.chess.algorithms.piece.Rook;
 
+/**
+ * creates the initial chess board with a start set of pieces
+ * @author EMALARCZ
+ *
+ */
 public class InitBoard {
-	
+
 	private Board board;
-	
+
 	public InitBoard(Board board) {
 		this.board = board;
 	}
-	
+
+	/**
+	 * puts the start set of pieces on the board
+	 */
 	public void initBoard() {
 
 		this.board.setPieceAt(new Rook(Color.BLACK), new Coordinate(0, 7));
