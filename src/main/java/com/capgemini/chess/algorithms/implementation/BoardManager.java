@@ -14,12 +14,8 @@ import com.capgemini.chess.algorithms.implementation.exceptions.InvalidColorExce
 import com.capgemini.chess.algorithms.implementation.exceptions.InvalidMoveException;
 import com.capgemini.chess.algorithms.implementation.exceptions.KingInCheckException;
 import com.capgemini.chess.algorithms.implementation.exceptions.NoKingException;
-import com.capgemini.chess.algorithms.move.AttackMove;
 import com.capgemini.chess.algorithms.move.CaptureMove;
-import com.capgemini.chess.algorithms.move.CastlingMove;
-import com.capgemini.chess.algorithms.move.EnPassantMove;
 import com.capgemini.chess.algorithms.move.Move;
-import com.capgemini.chess.algorithms.move.MoveValidation;
 import com.capgemini.chess.algorithms.piece.Bishop;
 import com.capgemini.chess.algorithms.piece.EnPassantPawn;
 import com.capgemini.chess.algorithms.piece.King;
@@ -275,97 +271,18 @@ public class BoardManager {
 			throw new InvalidMoveException("Next color to perform move is" + calculateNextMoveColor() + "!");
 		}
 		
-		//Move move = createTheMove(from, to);
+		Move consideredMove = Move.generateMove(this.board, from, to);
+		consideredMove.setMovedPiece(movedPiece);
 		
-		MoveValidation moveVal = new MoveValidation(this.board);
+		consideredMove.validateMoveWithoutConsideringCheck(this.board);
 		
-		if(moveVal.isAttackValidWithoutConsideringCheck(from, to)) {
-			Move consideredMove = new AttackMove(from, to);
-			consideredMove.setMovedPiece(movedPiece);
-			tempPiecesSwap(from, to);
-			if(isKingInCheck(this.board.getPieceAt(to).getColor())) {
-				tempPiecesSwap(to, from);
-				throw new KingInCheckException();
-			}
-			tempPiecesSwap(to, from);
-			return consideredMove;
+		if(consideredMove.getType() == MoveType.CASTLING) {
+			checkIfKingWouldBeInCheckOnItsWayForCastling(consideredMove);			
+		} else {
+			checkIfKingWouldBeInCheck(consideredMove);
 		}
-		
-		if(moveVal.isCaptureValidWithoutConsideringCheck(from, to)) {
-			Move consideredMove = new CaptureMove(from, to);
-			consideredMove.setMovedPiece(movedPiece);
-			tempPiecesSwap(from, to);
-			if(isKingInCheck(this.board.getPieceAt(to).getColor())) {
-				tempPiecesSwap(to, from);
-				throw new KingInCheckException();
-			}
-			tempPiecesSwap(to, from);
-			return consideredMove;
-		}
-		
-		if(moveVal.isCastlingValidWithoutConsideringCheck(from, to)) {
-			if(isKingInCheck(this.board.getPieceAt(from).getColor())) {
-				throw new KingInCheckException();
-			}
-			
-			Move consideredMove = new CastlingMove(from, to);
-			consideredMove.setMovedPiece(movedPiece);
-			
-			int start = from.getX();
-			int stop = to.getX();
-		
-			int absDistance = Math.abs(stop - start);
-			int direction = (stop - start) / absDistance;
-			for (int i = 1; i <= absDistance; i++) {
-				Coordinate squareOnTheWay = new Coordinate(from.getX() + i * direction, from.getY());
-				tempPiecesSwap(from, squareOnTheWay);
-				if(isKingInCheck(this.board.getPieceAt(squareOnTheWay).getColor())) {
-					tempPiecesSwap(squareOnTheWay, from);
-					throw new KingInCheckException();
-				}
-				tempPiecesSwap(squareOnTheWay, from);
-			}
-			return consideredMove;
-		}
-		
-		if(moveVal.isEnPassantValidWithoutConsideringCheck(from, to)) {
-			Move consideredMove = new EnPassantMove(from, to);
-			consideredMove.setMovedPiece(movedPiece);
-			tempPiecesSwap(from, to);
-			if(isKingInCheck(this.board.getPieceAt(to).getColor())) {
-				tempPiecesSwap(to, from);
-				throw new KingInCheckException();
-			}
-			tempPiecesSwap(to, from);
-			return consideredMove;
-		}
-		
-		throw new InvalidMoveException();
-	}
-
-	private Move createTheMove(Coordinate from, Coordinate to) throws InvalidMoveException {
-		Move testMove = new AttackMove(from, to);
-		
-		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
-			return testMove;
-		}
-		
-		testMove = (CaptureMove) testMove;
-		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
-			return testMove;
-		}
-		
-		testMove = (CastlingMove) testMove;
-		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
-			return testMove;
-		}
-		
-		testMove = (EnPassantMove) testMove;
-		if(testMove.isMoveValidWithoutConsideringCheck(this.board)) {
-			return testMove;
-		}
-		
-		throw new InvalidMoveException();
+	
+		return consideredMove;
 	}
 	
 	private void tempPiecesSwap(Coordinate from, Coordinate to) {
@@ -373,16 +290,42 @@ public class BoardManager {
 		this.board.setPieceAt(null, from);
 	}
 	
+	private void checkIfKingWouldBeInCheck(Move move) throws InvalidColorException, NoKingException, InvalidMoveException {
+		tempPiecesSwap(move.getFrom(), move.getTo());
+		if(isKingInCheck(move.getMovedPiece().getColor())) {
+			tempPiecesSwap(move.getTo(), move.getFrom());
+			throw new KingInCheckException();
+		}
+		tempPiecesSwap(move.getTo(), move.getFrom());
+	}
+	
+	private void checkIfKingWouldBeInCheckOnItsWayForCastling(Move move) throws InvalidMoveException, InvalidColorException, NoKingException {
+		Coordinate tempTo = new Coordinate(move.getFrom().getX(), move.getFrom().getY());
+		int direction = (move.getTo().getX() - move.getFrom().getX()) / Math.abs(move.getTo().getX() - move.getFrom().getX());
+				
+		for(int i = 1; i <= Math.abs(move.getTo().getX() - move.getFrom().getX()); i++) {
+			tempTo.setX(move.getFrom().getX() + i * direction);
+			tempPiecesSwap(move.getFrom(), tempTo);
+			if(isKingInCheck(this.board.getPieceAt(tempTo).getColor())) {
+				tempPiecesSwap(tempTo, move.getFrom());
+				throw new KingInCheckException();
+			}
+			tempPiecesSwap(tempTo, move.getFrom());
+		}
+	}
+
 	private boolean isKingInCheck(Color kingColor) throws InvalidColorException, NoKingException {
-	MoveValidation moveVal = new MoveValidation(this.board);
-	Coordinate positionOfKing = findTheKing(kingColor);
-		for(Coordinate square : findAllPiecesOfColor(oppositeColor(kingColor))) {
-			if(moveVal.isCaptureValidWithoutConsideringCheck(square, positionOfKing)) {
+		Coordinate positionOfKing = findTheKing(kingColor);
+			for(Coordinate square : findAllPiecesOfColor(oppositeColor(kingColor))) {
+				Move move = new CaptureMove(square, positionOfKing);
+				try {
+				move.validateMoveWithoutConsideringCheck(this.board);
 				return true;
+			} catch(InvalidMoveException e) {
+				continue;
 			}
 		}
 		return false;
-		// TODO złapać wyjątek koloru?
 	}
 	
 	private List<Coordinate> findAllPiecesOfColor(Color color) {

@@ -5,6 +5,7 @@ import java.util.List;
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
+import com.capgemini.chess.algorithms.data.generated.Board;
 
 public abstract class Piece {
 	
@@ -18,6 +19,8 @@ public abstract class Piece {
 	
 	public abstract List<Coordinate> possibleAttackMoves(Coordinate from);
 	
+	public abstract boolean isTheWayFreeToGo(Board board, Coordinate from, Coordinate to);
+
 	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
 		return possibleAttackMoves(from);
 	}
@@ -48,6 +51,65 @@ public abstract class Piece {
 		Piece other = (Piece) obj;
 		if (color != other.color)
 			return false;
+		return true;
+	}
+	
+	protected boolean isTheWayFreeDirX(Board board, Coordinate from, Coordinate to) {
+		int start = from.getX();
+		int stop = to.getX();
+		if(start == stop) {
+			return true;
+		}
+		int absDistance = Math.abs(stop - start);
+		int direction = (stop - start) / absDistance;
+		for (int i = 1; i < absDistance; i++) {
+			Coordinate squareOnTheWay = new Coordinate(from.getX() + i * direction, from.getY());
+			Piece pieceOnTheWay = board.getPieceAt(squareOnTheWay);
+			if (pieceOnTheWay != null && pieceOnTheWay.getType() != PieceType.EN_PASSANT_PAWN) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	protected boolean isTheWayFreeDirY(Board board, Coordinate from, Coordinate to) {
+		int start = from.getY();
+		int stop = to.getY();
+		if(start == stop) {
+			return true;
+		}
+		int absDistance = Math.abs(stop - start);
+		int direction = (stop - start) / absDistance;
+		for (int i = 1; i < absDistance; i++) {
+			Coordinate squareOnTheWay = new Coordinate(from.getX(), from.getY() + i * direction);
+			Piece pieceOnTheWay = board.getPieceAt(squareOnTheWay);
+			if (pieceOnTheWay != null && pieceOnTheWay.getType() != PieceType.EN_PASSANT_PAWN) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	protected boolean isTheWayFreeDiagonal(Board board, Coordinate from, Coordinate to) {
+		int startX = from.getX();
+		int stopX = to.getX();
+		int startY = from.getY();
+		int stopY = to.getY();
+		if(startX == stopX || startY == stopY) {
+			return true;
+		}
+		int absDistanceX = Math.abs(stopX - startX);
+		int directionX = (stopX - startX) / absDistanceX;
+		int absDistanceY = Math.abs(stopY - startY);
+		int directionY = (stopY - startY) / absDistanceY;
+		
+		for (int i = 1; i < absDistanceX; i++) {
+			Coordinate squareOnTheWay = new Coordinate(from.getX() + i * directionX, from.getY() + i * directionY);
+			Piece pieceOnTheWay = board.getPieceAt(squareOnTheWay);
+			if (pieceOnTheWay != null && pieceOnTheWay.getType() != PieceType.EN_PASSANT_PAWN) {
+				return false;
+			}
+		}
 		return true;
 	}
 

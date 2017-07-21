@@ -6,6 +6,7 @@ import java.util.List;
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
+import com.capgemini.chess.algorithms.data.generated.Board;
 
 public class Pawn extends Piece {
 	
@@ -51,6 +52,11 @@ public class Pawn extends Piece {
 		}
 		//TODO WrongColorException?
 		return null;
+	}
+	
+	@Override
+	public boolean isTheWayFreeToGo(Board board, Coordinate from, Coordinate to) {
+		return true;
 	}
 	
 	private List<Coordinate> possibleAttackMovesWhite(Coordinate from) {

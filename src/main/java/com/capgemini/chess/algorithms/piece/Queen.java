@@ -36,6 +36,13 @@ public class Queen  extends Piece {
 		return type;
 	}
 	
+	@Override
+	public boolean isTheWayFreeToGo(Board board, Coordinate from, Coordinate to) {
+		return (this.isTheWayFreeDirX(board, from, to)
+				&& this.isTheWayFreeDirY(board, from, to)
+				&& this.isTheWayFreeDiagonal(board, from, to));
+	}
+	
 	private List<Coordinate> possibleAttackMovesDiagonal(Coordinate from) {
 		List<Coordinate> allPossibleMovesDiagonal = new ArrayList<Coordinate>();
 		for(int i = (-1) * (Board.SIZE - 1); i < Board.SIZE; i++) {

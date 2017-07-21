@@ -6,6 +6,7 @@ import java.util.List;
 import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
+import com.capgemini.chess.algorithms.data.generated.Board;
 
 public class EnPassantPawn extends Piece{
 	
@@ -23,6 +24,11 @@ public class EnPassantPawn extends Piece{
 	@Override
 	public PieceType getType() {
 		return type;
+	}
+	
+	@Override
+	public boolean isTheWayFreeToGo(Board board, Coordinate from, Coordinate to) {
+		return true;
 	}
 	
 }

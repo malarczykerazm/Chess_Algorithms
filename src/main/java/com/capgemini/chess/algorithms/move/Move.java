@@ -4,6 +4,7 @@ import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.MoveType;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidMoveException;
 import com.capgemini.chess.algorithms.piece.Piece;
 
 public abstract class Move {
@@ -14,7 +15,7 @@ public abstract class Move {
 	
 	public abstract MoveType getType();
 
-	public abstract boolean isMoveValidWithoutConsideringCheck(Board board);
+	public abstract Move validateMoveWithoutConsideringCheck(Board board) throws InvalidMoveException;
 
 	public Move(Coordinate from, Coordinate to) {
 		this.from = from;
@@ -44,99 +45,28 @@ public abstract class Move {
 	public void setMovedPiece(Piece movedPiece) {
 		this.movedPiece = movedPiece;
 	}
+	
+	public static Move generateMove(Board board, Coordinate from, Coordinate to) {
+		if(board.getPieceAt(to) == null) {
+			if(board.getPieceAt(from).getType() == PieceType.KING && Math.abs(to.getX() - from.getX()) == 2) {
+				return new CastlingMove(from, to);
+			} else {
+				return new AttackMove(from, to);
+			}
+		} else if (board.getPieceAt(to).getType() == PieceType.EN_PASSANT_PAWN){
+			return new EnPassantMove(from, to);
+		} else {
+			return new CaptureMove(from, to);
+		}
+	}
 
-	protected boolean wasThePieceMoved(Board board) {
+	protected boolean wasThePieceMoved(Board board, Coordinate pieceLocation) {
 		for(Move performedMove : board.getMoveHistory()) {
-			if(performedMove.getFrom().equals(this.getFrom())) {
+			if(performedMove.getFrom().equals(pieceLocation)) {
 				return true;				
 			}
 		}
 		return false;
-	}
-	
-	
-	protected boolean isTheWayFreeToGo(Board board) {
-		Piece movedPiece = board.getPieceAt(this.getFrom());
-		if (movedPiece.getType() == PieceType.BISHOP) {
-			return isTheWayFreeDiagonal(board);
-		}
-		if (movedPiece.getType() == PieceType.ROOK) {
-			if (isTheWayFreeDirX(board) 
-				&& isTheWayFreeDirY(board)) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		if (movedPiece.getType() == PieceType.QUEEN) {
-			if (isTheWayFreeDirX(board)
-					&& isTheWayFreeDirY(board) 
-					&& isTheWayFreeDiagonal(board)) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean isTheWayFreeDirX(Board board) {
-		int start = this.getFrom().getX();
-		int stop = this.getTo().getX();
-		if(start == stop) {
-			return true;
-		}
-		int absDistance = Math.abs(stop - start);
-		int direction = (stop - start) / absDistance;
-		for (int i = 1; i < absDistance; i++) {
-			Coordinate squareOnTheWay = new Coordinate(this.getFrom().getX() + i * direction, this.getFrom().getY());
-			Piece pieceOnTheWay = board.getPieceAt(squareOnTheWay);
-			if (pieceOnTheWay != null && pieceOnTheWay.getType() != PieceType.EN_PASSANT_PAWN) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean isTheWayFreeDirY(Board board) {
-		int start = this.getFrom().getY();
-		int stop = this.getTo().getY();
-		if(start == stop) {
-			return true;
-		}
-		int absDistance = Math.abs(stop - start);
-		int direction = (stop - start) / absDistance;
-		for (int i = 1; i < absDistance; i++) {
-			Coordinate squareOnTheWay = new Coordinate(this.getFrom().getX(), this.getFrom().getY() + i * direction);
-			Piece pieceOnTheWay = board.getPieceAt(squareOnTheWay);
-			if (pieceOnTheWay != null && pieceOnTheWay.getType() != PieceType.EN_PASSANT_PAWN) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private boolean isTheWayFreeDiagonal(Board board) {
-		int startX = this.getFrom().getX();
-		int stopX = this.getTo().getX();
-		int startY = this.getFrom().getY();
-		int stopY = this.getTo().getY();
-		if(startX == stopX || startY == stopY) {
-			return true;
-		}
-		int absDistanceX = Math.abs(stopX - startX);
-		int directionX = (stopX - startX) / absDistanceX;
-		int absDistanceY = Math.abs(stopY - startY);
-		int directionY = (stopY - startY) / absDistanceY;
-		
-		for (int i = 1; i < absDistanceX; i++) {
-			Coordinate squareOnTheWay = new Coordinate(this.getFrom().getX() + i * directionX, this.getFrom().getY() + i * directionY);
-			Piece pieceOnTheWay = board.getPieceAt(squareOnTheWay);
-			if (pieceOnTheWay != null && pieceOnTheWay.getType() != PieceType.EN_PASSANT_PAWN) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 }

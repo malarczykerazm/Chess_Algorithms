@@ -34,5 +34,10 @@ public class Bishop extends Piece {
 	public PieceType getType() {
 		return type;
 	}
+	
+	@Override
+	public boolean isTheWayFreeToGo(Board board, Coordinate from, Coordinate to) {
+		return this.isTheWayFreeDiagonal(board, from, to);
+	}
 
 }

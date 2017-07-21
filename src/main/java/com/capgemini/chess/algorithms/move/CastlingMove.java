@@ -6,6 +6,7 @@ import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.MoveType;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidMoveException;
 import com.capgemini.chess.algorithms.piece.King;
 
 public class CastlingMove extends Move {
@@ -22,10 +23,10 @@ public class CastlingMove extends Move {
 	}
 	
 	@Override
-	public boolean isMoveValidWithoutConsideringCheck(Board board) {
+	public Move validateMoveWithoutConsideringCheck(Board board) throws InvalidMoveException {
 
-		if(!(isThisTheFirstMoveOfTheKing(board))) {
-			return false;
+		if(!(isThisTheFirstMoveOfTheKing(board, this.getFrom()))) {
+			throw new InvalidMoveException();
 		}
 		
 		List<Coordinate> possibleMoves = ((King) board.getPieceAt(this.getFrom())).possibleCastlingMoves(this.getFrom());
@@ -38,38 +39,46 @@ public class CastlingMove extends Move {
 		}
 		
 		if(i == 0) {
-			return false;
+			throw new InvalidMoveException();
 		}
 		
 		if(!(isTheWayFreeForCastling(board))) {
-			return false;
+			throw new InvalidMoveException();
 		}
 		
 		if(this.getTo().getX() >= this.getFrom().getX()) {
-			return isThisTheFirstMoveOfTheRook(board);
+			if(isThisTheFirstMoveOfTheRook(board, new Coordinate(Board.SIZE - 1, this.getFrom().getY()))) {
+				return this;
+			} else {
+				throw new InvalidMoveException();
+			}
 		} else {
 			if(board.getPieceAt(new Coordinate(1, this.getFrom().getY())) != null) {
-				return false;
+				throw new InvalidMoveException();
 			}
-			return isThisTheFirstMoveOfTheRook(board);
+			if(isThisTheFirstMoveOfTheRook(board, new Coordinate(0, this.getFrom().getY()))) {
+				return this;
+			} else {
+				throw new InvalidMoveException();
+			}
 		}
 	}
 	
-	private boolean isThisTheFirstMoveOfTheKing(Board board) {
+	private boolean isThisTheFirstMoveOfTheKing(Board board, Coordinate kingLocation) {
 		if(board.getPieceAt(this.getFrom()).getType() != PieceType.KING) {
 			return false;
 		}
 		if(!(this.getFrom().equals(new Coordinate(4, 0)) || this.getFrom().equals(new Coordinate(4, 7)))) {
 			return false;
 		}
-		return !(wasThePieceMoved(board));
+		return !(wasThePieceMoved(board, kingLocation));
 	}
 	
-	private boolean isThisTheFirstMoveOfTheRook(Board board) {
-		if(board.getPieceAt(this.getFrom()) == null || board.getPieceAt(this.getFrom()).getType() != PieceType.ROOK) {
+	private boolean isThisTheFirstMoveOfTheRook(Board board, Coordinate rookLocation) {
+		if(board.getPieceAt(rookLocation) == null || board.getPieceAt(rookLocation).getType() != PieceType.ROOK) {
 			return false;
 		}
-		return !(wasThePieceMoved(board));
+		return !(wasThePieceMoved(board, rookLocation));
 	}
 	
 	private boolean isTheWayFreeForCastling(Board board) {

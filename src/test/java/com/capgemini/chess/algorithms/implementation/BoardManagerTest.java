@@ -895,4 +895,36 @@ public class BoardManagerTest {
 		}
 		return counter;
 	}
+	
+	@Test
+	public void shouldPerformMoveCastlingInTheNegativeXDirection() throws InvalidMoveException, InvalidColorException, NoKingException {
+		// given
+		Board board = new Board();
+		board.setPieceAt(new King(Color.WHITE), new Coordinate(4, 0));
+		board.setPieceAt(new Rook(Color.WHITE), new Coordinate(0, 0));
+		
+		// when
+		BoardManager boardManager = new BoardManager(board);
+		Move move = boardManager.performMove(new Coordinate(4, 0), new Coordinate(2, 0));
+		
+		// then
+		assertEquals(MoveType.CASTLING, move.getType());
+		assertEquals(new King(Color.WHITE), move.getMovedPiece());
+	}
+	
+	@Test (expected = KingInCheckException.class)
+	public void shouldThrowExceptionDueToKingInCheckDuringCastlingInTheNegativeXDirection() throws InvalidMoveException, InvalidColorException, NoKingException {
+		// given
+		Board board = new Board();
+		board.getMoveHistory().add(createDummyMove(board));
+		board.setPieceAt(new King(Color.BLACK), new Coordinate(4, 7));
+		board.setPieceAt(new Rook(Color.BLACK), new Coordinate(0, 7));
+		board.setPieceAt(new Bishop(Color.WHITE), new Coordinate(7, 3));
+		
+		// when
+		BoardManager boardManager = new BoardManager(board);
+		boardManager.performMove(new Coordinate(4, 7), new Coordinate(2, 7));
+		
+		// then
+	}
 }

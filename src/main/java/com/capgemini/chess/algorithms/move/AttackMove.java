@@ -6,6 +6,7 @@ import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.MoveType;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidMoveException;
 import com.capgemini.chess.algorithms.piece.Piece;
 
 public class AttackMove extends Move {
@@ -22,7 +23,7 @@ public class AttackMove extends Move {
 	}
 	
 	@Override
-	public boolean isMoveValidWithoutConsideringCheck(Board board) {
+	public Move validateMoveWithoutConsideringCheck(Board board) throws InvalidMoveException {
 		Piece movedPiece = board.getPieceAt(this.getFrom());
 		List<Coordinate> possibleAttacks = movedPiece.possibleAttackMoves(this.getFrom());
 		
@@ -32,12 +33,12 @@ public class AttackMove extends Move {
 		
 		for (Coordinate square : possibleAttacks) {
 			if(square.equals(this.getTo())) {
-				if (isMovePossibleForDestination(board) && isTheWayFreeToGo(board)) {
-					return true;
+				if (isMovePossibleForDestination(board) && movedPiece.isTheWayFreeToGo(board, this.getFrom(), this.getTo())) {
+					return this;
 				}
 			}
 		}
-		return false;
+		throw new InvalidMoveException();
 	}
 	
 	private boolean isMovePossibleForDestination(Board board) {
