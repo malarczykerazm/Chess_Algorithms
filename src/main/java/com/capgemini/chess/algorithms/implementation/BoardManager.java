@@ -16,14 +16,10 @@ import com.capgemini.chess.algorithms.implementation.exceptions.KingInCheckExcep
 import com.capgemini.chess.algorithms.implementation.exceptions.NoKingException;
 import com.capgemini.chess.algorithms.move.CaptureMove;
 import com.capgemini.chess.algorithms.move.Move;
-import com.capgemini.chess.algorithms.piece.Bishop;
 import com.capgemini.chess.algorithms.piece.EnPassantPawn;
-import com.capgemini.chess.algorithms.piece.King;
-import com.capgemini.chess.algorithms.piece.Knight;
-import com.capgemini.chess.algorithms.piece.Pawn;
+import com.capgemini.chess.algorithms.piece.PawnAfterFirstMove;
 import com.capgemini.chess.algorithms.piece.Piece;
 import com.capgemini.chess.algorithms.piece.Queen;
-import com.capgemini.chess.algorithms.piece.Rook;
 
 /**
  * Class for managing of basic operations on the Chess Board.
@@ -36,11 +32,11 @@ public class BoardManager {
 	private Board board = new Board();
 
 	public BoardManager() {
-		initBoard();
+		new InitBoard(this.board).initBoard();
 	}
 
 	public BoardManager(List<Move> moves) {
-		initBoard();
+		new InitBoard(this.board).initBoard();
 		for (Move move : moves) {
 			addMove(move);
 		}
@@ -165,35 +161,6 @@ public class BoardManager {
 
 	// PRIVATE
 
-	private void initBoard() {
-
-		this.board.setPieceAt(new Rook(Color.BLACK), new Coordinate(0, 7));
-		this.board.setPieceAt(new Knight(Color.BLACK), new Coordinate(1, 7));
-		this.board.setPieceAt(new Bishop(Color.BLACK), new Coordinate(2, 7));
-		this.board.setPieceAt(new Queen(Color.BLACK), new Coordinate(3, 7));
-		this.board.setPieceAt(new King(Color.BLACK), new Coordinate(4, 7));
-		this.board.setPieceAt(new Bishop(Color.BLACK), new Coordinate(5, 7));
-		this.board.setPieceAt(new Knight(Color.BLACK), new Coordinate(6, 7));
-		this.board.setPieceAt(new Rook(Color.BLACK), new Coordinate(7, 7));
-
-		for (int x = 0; x < Board.SIZE; x++) {
-			this.board.setPieceAt(new Pawn(Color.BLACK), new Coordinate(x, 6));
-		}
-
-		this.board.setPieceAt(new Rook(Color.WHITE), new Coordinate(0, 0));
-		this.board.setPieceAt(new Knight(Color.WHITE), new Coordinate(1, 0));
-		this.board.setPieceAt(new Bishop(Color.WHITE), new Coordinate(2, 0));
-		this.board.setPieceAt(new Queen(Color.WHITE), new Coordinate(3, 0));
-		this.board.setPieceAt(new King(Color.WHITE), new Coordinate(4, 0));
-		this.board.setPieceAt(new Bishop(Color.WHITE), new Coordinate(5, 0));
-		this.board.setPieceAt(new Knight(Color.WHITE), new Coordinate(6, 0));
-		this.board.setPieceAt(new Rook(Color.WHITE), new Coordinate(7, 0));
-
-		for (int x = 0; x < Board.SIZE; x++) {
-			this.board.setPieceAt(new Pawn(Color.WHITE), new Coordinate(x, 1));
-		}
-	}
-
 	private void addMove(Move move) {
 
 		addRegularMove(move);
@@ -211,6 +178,8 @@ public class BoardManager {
 		}
 		
 		setNewEnPassantPawnIfNeeded();
+		
+		changeFirstMovePawnIntoRegularPawnIfNeeded();
 		
 		}
 		//TODO Naprawic babole? Wyrzucac constanty do osobnej klasy i tu tylko importowac? 
@@ -444,6 +413,15 @@ public class BoardManager {
 			Piece shadowPawn = new EnPassantPawn(lastMove.getMovedPiece().getColor());
 			Coordinate shadowPawnLocation = new Coordinate(lastMove.getFrom().getX(), lastMove.getFrom().getY() + lastMoveLength / 2);
 			this.board.setPieceAt(shadowPawn, shadowPawnLocation);
+		}
+	}
+	
+	private void changeFirstMovePawnIntoRegularPawnIfNeeded() {
+		Move lastMove = this.board.getMoveHistory().get(this.board.getMoveHistory().size() - 1);
+		if(lastMove.getType() == MoveType.ATTACK
+				&& lastMove.getMovedPiece() != null
+				&& lastMove.getMovedPiece().getType() == PieceType.PAWN) {
+			this.board.setPieceAt(new PawnAfterFirstMove(lastMove.getMovedPiece().getColor()), lastMove.getTo());
 		}
 	}
 

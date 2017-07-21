@@ -12,7 +12,7 @@ import com.capgemini.chess.algorithms.implementation.exceptions.InvalidColorExce
 public class Pawn extends Piece {
 	
 	private final PieceType type = PieceType.PAWN;
-
+	
 	public Pawn(Color color) {
 		super(color);
 	}
@@ -20,16 +20,11 @@ public class Pawn extends Piece {
 	@Override
 	public List<Coordinate> possibleAttackMoves(Coordinate from) throws InvalidColorException {
 		if(this.getColor() == Color.WHITE) {
-			return possibleAttackMovesWhite(from);
+			return possibleAttackMovesForFirstMoveWhite(from);
 		} else if(this.getColor() == Color.BLACK) {
-			return possibleAttackMovesBlack(from);
+			return possibleAttackMovesForFirstMoveBlack(from);
 		}
 		throw new InvalidColorException("The Pawn has an invalid color!");
-	}
-	
-	@Override
-	public PieceType getType() {
-		return type;
 	}
 	
 	@Override
@@ -43,31 +38,30 @@ public class Pawn extends Piece {
 	}
 	
 	@Override
-	public List<Coordinate> possibleAttackMovesForFirstMove(Coordinate from) throws InvalidColorException {
-		if(this.getColor() == Color.WHITE) {
-			return possibleAttackMovesForFirstMoveWhite(from);
-		} else if(this.getColor() == Color.BLACK) {
-			return possibleAttackMovesForFirstMoveBlack(from);
-		}
-		throw new InvalidColorException("The Pawn has an invalid color!");
-	}
-	
-	@Override
 	public boolean isTheWayFreeToGo(Board board, Coordinate from, Coordinate to) {
 		return true;
 	}
 	
-	private List<Coordinate> possibleAttackMovesWhite(Coordinate from) {
+	@Override
+	public PieceType getType() {
+		return type;
+	}
+	
+	private List<Coordinate> possibleAttackMovesForFirstMoveWhite(Coordinate from) {
 		List<Coordinate> allPossibleAttackMovesWhite = new ArrayList<Coordinate>();
-		Coordinate to = new Coordinate (from.getX(), from.getY() + 1);
-		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to);
+		Coordinate to1 = new Coordinate (from.getX(), from.getY() + 1);
+		Coordinate to2 = new Coordinate (from.getX(), from.getY() + 2);
+		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to1);
+		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to2);
 		return allPossibleAttackMovesWhite;
 	}
 	
-	private List<Coordinate> possibleAttackMovesBlack(Coordinate from) {
+	private List<Coordinate> possibleAttackMovesForFirstMoveBlack(Coordinate from) {
 		List<Coordinate> allPossibleAttackMovesBlack = new ArrayList<Coordinate>();
-		Coordinate to = new Coordinate (from.getX(), from.getY() - 1);
-		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to);
+		Coordinate to1 = new Coordinate (from.getX(), from.getY() - 1);
+		Coordinate to2 = new Coordinate (from.getX(), from.getY() - 2);
+		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to1);
+		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to2);
 		return allPossibleAttackMovesBlack;
 	}	
 	
@@ -89,22 +83,4 @@ public class Pawn extends Piece {
 		return allPossibleCaptureMovesBlack;
 	}
 	
-	private List<Coordinate> possibleAttackMovesForFirstMoveWhite(Coordinate from) {
-		List<Coordinate> allPossibleAttackMovesWhite = new ArrayList<Coordinate>();
-		Coordinate to1 = new Coordinate (from.getX(), from.getY() + 1);
-		Coordinate to2 = new Coordinate (from.getX(), from.getY() + 2);
-		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to1);
-		allPossibleAttackMovesWhite = addIfValid(allPossibleAttackMovesWhite, to2);
-		return allPossibleAttackMovesWhite;
-	}
-	
-	private List<Coordinate> possibleAttackMovesForFirstMoveBlack(Coordinate from) {
-		List<Coordinate> allPossibleAttackMovesBlack = new ArrayList<Coordinate>();
-		Coordinate to1 = new Coordinate (from.getX(), from.getY() - 1);
-		Coordinate to2 = new Coordinate (from.getX(), from.getY() - 2);
-		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to1);
-		allPossibleAttackMovesBlack = addIfValid(allPossibleAttackMovesBlack, to2);
-		return allPossibleAttackMovesBlack;
-	}	
-
 }

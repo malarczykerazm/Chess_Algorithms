@@ -29,6 +29,7 @@ import com.capgemini.chess.algorithms.piece.Bishop;
 import com.capgemini.chess.algorithms.piece.King;
 import com.capgemini.chess.algorithms.piece.Knight;
 import com.capgemini.chess.algorithms.piece.Pawn;
+import com.capgemini.chess.algorithms.piece.Piece;
 import com.capgemini.chess.algorithms.piece.Queen;
 import com.capgemini.chess.algorithms.piece.Rook;
 
@@ -429,19 +430,24 @@ public class BoardManagerTest {
 	@Test
 	public void testPerformMoveInvalidPawnAttackDistance() throws InvalidColorException, NoKingException {
 		// given
-		Board board = new Board();
-		board.setPieceAt(new Pawn(Color.WHITE), new Coordinate(1, 2));
-			// King added to make the test possible to run
-			board.setPieceAt(new King(Color.WHITE), new Coordinate(5, 2)); 
-		
-		// when
-		BoardManager boardManager = new BoardManager(board);
-		boolean exceptionThrown = false;
-		try {
-			boardManager.performMove(new Coordinate(1, 2), new Coordinate(1, 4));
-		} catch (InvalidMoveException e) {
-			exceptionThrown = true;
-		}
+			Board board = new Board();
+			Piece movedPiece = new Pawn(Color.WHITE);
+			board.setPieceAt(movedPiece, new Coordinate(1, 1));
+			Move changeOfThePawn = new AttackMove(new Coordinate(1, 1), new Coordinate(1, 2));
+			changeOfThePawn.setMovedPiece(board.getPieceAt(changeOfThePawn.getFrom()));
+			board.getMoveHistory().add(changeOfThePawn);
+			board.getMoveHistory().add(createDummyMove(board));
+				// King added to make the test possible to run
+				board.setPieceAt(new King(Color.WHITE), new Coordinate(7, 7));
+				
+			// when
+			BoardManager boardManager = new BoardManager(board.getMoveHistory());
+			boolean exceptionThrown = false;
+			try {
+				boardManager.performMove(new Coordinate(1, 2), new Coordinate(1, 4));
+			} catch (InvalidMoveException e) {
+					exceptionThrown = true;
+			}
 		
 		// then 
 		assertTrue(exceptionThrown);
