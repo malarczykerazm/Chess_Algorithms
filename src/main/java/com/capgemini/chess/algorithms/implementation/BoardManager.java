@@ -362,7 +362,6 @@ public class BoardManager {
 	}
 	
 	private Color oppositeColor(Color color) throws InvalidColorException {
-		//TODO DODANO
 		if(color == Color.WHITE) {
 			return Color.BLACK;
 		}

@@ -8,4 +8,8 @@ public class InvalidColorException extends Exception {
 		super("The color of the piece is invalid!");
 	}
 	
+	public InvalidColorException(String message) {
+		super(message);
+	}
+	
 }

@@ -7,6 +7,7 @@ import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidColorException;
 
 public class Pawn extends Piece {
 	
@@ -17,14 +18,13 @@ public class Pawn extends Piece {
 	}
 
 	@Override
-	public List<Coordinate> possibleAttackMoves(Coordinate from) {
+	public List<Coordinate> possibleAttackMoves(Coordinate from) throws InvalidColorException {
 		if(this.getColor() == Color.WHITE) {
 			return possibleAttackMovesWhite(from);
 		} else if(this.getColor() == Color.BLACK) {
 			return possibleAttackMovesBlack(from);
 		}
-		//TODO WrongColorException?
-		return null;
+		throw new InvalidColorException("The Pawn has an invalid color!");
 	}
 	
 	@Override
@@ -33,14 +33,13 @@ public class Pawn extends Piece {
 	}
 	
 	@Override
-	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
+	public List<Coordinate> possibleCaptureMoves(Coordinate from) throws InvalidColorException {
 		if(this.getColor() == Color.WHITE) {
 			return possibleCaptureMovesWhite(from);
 		} else if(this.getColor() == Color.BLACK) {
 			return possibleCaptureMovesBlack(from);
 		}
-		//TODO WrongColorException?
-		return null;
+		throw new InvalidColorException("The Pawn has an invalid color!");
 	}
 	
 	@Override

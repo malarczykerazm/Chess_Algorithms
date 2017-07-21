@@ -6,6 +6,7 @@ import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.Color;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidColorException;
 
 public abstract class Piece {
 	
@@ -17,18 +18,18 @@ public abstract class Piece {
 	
 	public abstract PieceType getType();
 	
-	public abstract List<Coordinate> possibleAttackMoves(Coordinate from);
+	public abstract List<Coordinate> possibleAttackMoves(Coordinate from) throws InvalidColorException;
+
+	public List<Coordinate> possibleCaptureMoves(Coordinate from) throws InvalidColorException {
+		return possibleAttackMoves(from);
+	}
+	
+	public List<Coordinate> possibleAttackMovesForFirstMove(Coordinate from) throws InvalidColorException {
+		return possibleAttackMoves(from);
+	}
 	
 	public abstract boolean isTheWayFreeToGo(Board board, Coordinate from, Coordinate to);
 
-	public List<Coordinate> possibleCaptureMoves(Coordinate from) {
-		return possibleAttackMoves(from);
-	}
-	
-	public List<Coordinate> possibleAttackMovesForFirstMove(Coordinate from) {
-		return possibleAttackMoves(from);
-	}
-	
 	public Color getColor() {
 		return this.color;
 	}

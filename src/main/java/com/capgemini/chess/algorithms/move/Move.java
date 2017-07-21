@@ -4,6 +4,7 @@ import com.capgemini.chess.algorithms.data.Coordinate;
 import com.capgemini.chess.algorithms.data.enums.MoveType;
 import com.capgemini.chess.algorithms.data.enums.PieceType;
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidColorException;
 import com.capgemini.chess.algorithms.implementation.exceptions.InvalidMoveException;
 import com.capgemini.chess.algorithms.piece.Piece;
 
@@ -15,7 +16,7 @@ public abstract class Move {
 	
 	public abstract MoveType getType();
 
-	public abstract Move validateMoveWithoutConsideringCheck(Board board) throws InvalidMoveException;
+	public abstract Move validateMoveWithoutConsideringCheck(Board board) throws InvalidMoveException, InvalidColorException;
 
 	public Move(Coordinate from, Coordinate to) {
 		this.from = from;
