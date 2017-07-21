@@ -43,14 +43,13 @@ public class Pawn extends Piece {
 	}
 	
 	@Override
-	public List<Coordinate> possibleAttackMovesForFirstMove(Coordinate from) {
+	public List<Coordinate> possibleAttackMovesForFirstMove(Coordinate from) throws InvalidColorException {
 		if(this.getColor() == Color.WHITE) {
 			return possibleAttackMovesForFirstMoveWhite(from);
 		} else if(this.getColor() == Color.BLACK) {
 			return possibleAttackMovesForFirstMoveBlack(from);
 		}
-		//TODO WrongColorException?
-		return null;
+		throw new InvalidColorException("The Pawn has an invalid color!");
 	}
 	
 	@Override

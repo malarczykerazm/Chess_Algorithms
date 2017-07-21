@@ -1,6 +1,7 @@
 package com.capgemini.chess.algorithms.data;
 
 import com.capgemini.chess.algorithms.data.generated.Board;
+import com.capgemini.chess.algorithms.implementation.exceptions.InvalidMoveException;
 
 /**
  * Coordinates of Chess Piece.
@@ -41,6 +42,12 @@ public class Coordinate {
 		if (y != other.y)
 			return false;
 		return true;
+	}
+	
+	public void coordinateValidator() throws InvalidMoveException {
+		if(!(this.isValid())) {
+			throw new InvalidMoveException("The coordinates of the move are invalid!");
+		}
 	}
 	
 	public boolean isValid() {

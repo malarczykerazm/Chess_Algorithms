@@ -210,19 +210,11 @@ public class BoardManager {
 			getRidOfTheEnPassantPawn();
 		}
 		
-		Move lastMove = this.board.getMoveHistory().get(this.board.getMoveHistory().size() - 1);
-		int lastMoveLength = lastMove.getTo().getY() - lastMove.getFrom().getY();
-		if(lastMove.getType() == MoveType.ATTACK
-				&& lastMove.getMovedPiece() != null
-				&& lastMove.getMovedPiece().getType() == PieceType.PAWN
-				&& Math.abs(lastMoveLength) == 2) {
-			Piece shadowPawn = new EnPassantPawn(lastMove.getMovedPiece().getColor());
-			Coordinate shadowPawnLocation = new Coordinate(lastMove.getFrom().getX(), lastMove.getFrom().getY() + lastMoveLength / 2);
-			this.board.setPieceAt(shadowPawn, shadowPawnLocation);
-		}
-//TODO Naprawic babole? Wyrzucac constanty do osobnej klasy i tu tylko importowac? 
+		setNewEnPassantPawnIfNeeded();
 		
-	}
+		}
+		//TODO Naprawic babole? Wyrzucac constanty do osobnej klasy i tu tylko importowac? 
+		
 
 	private void addRegularMove(Move move) {
 		Piece movedPiece = this.board.getPieceAt(move.getFrom());
@@ -257,22 +249,11 @@ public class BoardManager {
 	}
 
 	private Move validateMove(Coordinate from, Coordinate to) throws InvalidMoveException, KingInCheckException, InvalidColorException, NoKingException {
-		//TODO coordinate validation z wbudowanym rzucaniem wyjatkiem?
 		
-		if(!(from.isValid())) { throw new InvalidMoveException("The start square is out of the board!"); }
-		
-		if(!(to.isValid())) { throw new InvalidMoveException("The destination square is out of the board!"); }
-
-		Piece movedPiece = this.board.getPieceAt(from);
-		
-		if(movedPiece == null || movedPiece.getType() == PieceType.EN_PASSANT_PAWN) { throw new InvalidMoveException("The start square is empty!"); }
-	
-		if(movedPiece.getColor() != calculateNextMoveColor()) {
-			throw new InvalidMoveException("Next color to perform move is" + calculateNextMoveColor() + "!");
-		}
+		preValidateMove(from, to);
 		
 		Move consideredMove = Move.generateMove(this.board, from, to);
-		consideredMove.setMovedPiece(movedPiece);
+		consideredMove.setMovedPiece(this.board.getPieceAt(from));
 		
 		consideredMove.validateMoveWithoutConsideringCheck(this.board);
 		
@@ -283,6 +264,25 @@ public class BoardManager {
 		}
 	
 		return consideredMove;
+	}
+
+	private void preValidateMove(Coordinate from, Coordinate to) throws InvalidMoveException {
+		from.coordinateValidator();
+		to.coordinateValidator();
+		startSquareValidator(from);
+		nextTurnColorValidator(from);
+	}
+
+	private void nextTurnColorValidator(Coordinate from) throws InvalidMoveException {
+		if(this.board.getPieceAt(from).getColor() != calculateNextMoveColor()) {
+			throw new InvalidMoveException("Next color to perform move is" + calculateNextMoveColor() + "!");
+		}
+	}
+
+	private void startSquareValidator(Coordinate from) throws InvalidMoveException {
+		if(this.board.getPieceAt(from) == null || this.board.getPieceAt(from).getType() == PieceType.EN_PASSANT_PAWN) {
+			throw new InvalidMoveException("The start square is empty!");
+		}
 	}
 	
 	private void tempPiecesSwap(Coordinate from, Coordinate to) {
@@ -329,7 +329,6 @@ public class BoardManager {
 	}
 	
 	private List<Coordinate> findAllPiecesOfColor(Color color) {
-		//TODO DODANO
 		List<Coordinate> allPiecesOfColor = new ArrayList<Coordinate>();
 		for(int i = 0; i < Board.SIZE; i++) {
 			for(int j = 0; j < Board.SIZE; j++) {
@@ -347,7 +346,6 @@ public class BoardManager {
 	}
 	
 	private Coordinate findTheKing(Color color) throws NoKingException {
-		//TODO DODADNO
 		for(int i = 0; i < Board.SIZE; i++) {
 			for(int j = 0; j < Board.SIZE; j++) {
 				Coordinate square = new Coordinate(i, j);
@@ -433,6 +431,19 @@ public class BoardManager {
 					break;
 				}
 			}
+		}
+	}
+	
+	private void setNewEnPassantPawnIfNeeded() {
+		Move lastMove = this.board.getMoveHistory().get(this.board.getMoveHistory().size() - 1);
+		int lastMoveLength = lastMove.getTo().getY() - lastMove.getFrom().getY();
+		if(lastMove.getType() == MoveType.ATTACK
+				&& lastMove.getMovedPiece() != null
+				&& lastMove.getMovedPiece().getType() == PieceType.PAWN
+				&& Math.abs(lastMoveLength) == 2) {
+			Piece shadowPawn = new EnPassantPawn(lastMove.getMovedPiece().getColor());
+			Coordinate shadowPawnLocation = new Coordinate(lastMove.getFrom().getX(), lastMove.getFrom().getY() + lastMoveLength / 2);
+			this.board.setPieceAt(shadowPawn, shadowPawnLocation);
 		}
 	}
 
